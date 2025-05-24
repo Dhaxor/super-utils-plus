@@ -1,0 +1,26 @@
+# Source
+src/
+tests/
+
+# Config files
+.eslintrc
+.prettierrc
+.gitignore
+.github/
+.vscode/
+jest.config.js
+rollup.config.js
+tsconfig.json
+
+# Build artifacts
+coverage/
+.nyc_output/
+
+# Documentation
+docs/
+
+# Development files
+*.log
+*.tgz
+.DS_Store
+node_modules/

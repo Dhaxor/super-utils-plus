@@ -1,0 +1,55 @@
+{
+  "name": "super-utils-plus",
+  "version": "1.0.1",
+  "description": "A superior alternative to Lodash with improved performance, TypeScript support, and developer experience",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "demo": "node demo.js"
+  },
+  "keywords": [
+    "utility",
+    "functional",
+    "lodash",
+    "array",
+    "object",
+    "string",
+    "function",
+    "performance"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.45.0",
+    "jest": "^29.6.1",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.1.6"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dhaxor/super-utils-plus.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhaxor/super-utils-plus/issues"
+  },
+  "homepage": "https://github.com/super-utils-plus/super-utils#readme"
+}
