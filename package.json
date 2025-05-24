@@ -1,6 +1,6 @@
 {
   "name": "super-utils-plus",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A superior alternative to Lodash with improved performance, TypeScript support, and developer experience",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -51,5 +51,5 @@
   "bugs": {
     "url": "https://github.com/dhaxor/super-utils-plus/issues"
   },
-  "homepage": "https://github.com/super-utils-plus/super-utils#readme"
+  "homepage": "https://github.com/Dhaxor/super-utils-plus/blob/master/README.md"
 }

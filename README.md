@@ -16,11 +16,11 @@ A superior alternative to Lodash with improved performance, TypeScript support, 
 ## Installation
 
 ```bash
-npm install super-utils
+npm install super-utils-plus
 # or
-yarn add super-utils
+yarn add super-utils-plus
 # or
-pnpm add super-utils
+pnpm add super-utils-plus
 ```
 
 ## Usage Examples
