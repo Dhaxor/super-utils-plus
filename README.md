@@ -28,7 +28,7 @@ pnpm add super-utils-plus
 ### Array Functions
 
 ```js
-import { chunk, compact, difference, flatten, flattenDeep, groupBy } from 'super-utils';
+import { chunk, compact, difference, flatten, flattenDeep, groupBy, range } from 'super-utils-plus';
 
 // Create chunks of arrays
 chunk([1, 2, 3, 4, 5], 2);
@@ -68,12 +68,22 @@ groupBy([6.1, 4.2, 6.3], Math.floor);
 
 groupBy(['one', 'two', 'three'], 'length');
 // => { '3': ['one', 'two'], '5': ['three'] }
+
+// Create numeric ranges
+range(4);
+// => [0, 1, 2, 3]
+
+range(1, 5);
+// => [1, 2, 3, 4]
+
+range(0, 20, 5);
+// => [0, 5, 10, 15]
 ```
 
 ### Object Functions
 
 ```js
-import { get, deepClone } from 'super-utils';
+import { get, deepClone } from 'super-utils-plus';
 
 // Get a value from an object with a path
 const object = { 'a': [{ 'b': { 'c': 3 } }] };
@@ -98,7 +108,7 @@ original.b.c = 99;
 ### String Functions
 
 ```js
-import { camelCase } from 'super-utils';
+import { camelCase } from 'super-utils-plus';
 
 // Convert a string to camel case
 camelCase('Foo Bar');
@@ -114,7 +124,7 @@ camelCase('__FOO_BAR__');
 ### Function Utilities
 
 ```js
-import { debounce } from 'super-utils';
+import { debounce } from 'super-utils-plus';
 
 // Create a debounced function
 const debouncedSave = debounce(saveFunction, 300, { leading: true, trailing: true });
@@ -137,7 +147,7 @@ debouncedSave.flush();
 import { 
   isNil, isUndefined, isNull, isNumber, isString, isBoolean,
   isFunction, isArray, isObject, isPlainObject, isEmpty, isEqual 
-} from 'super-utils';
+} from 'super-utils-plus';
 
 // Check types
 isNumber(123);      // => true
@@ -159,10 +169,21 @@ isEqual({ a: 1, b: 2 }, { a: 1, b: 2 });  // => true
 isEqual([1, 2, 3], [1, 2, 3]);            // => true
 ```
 
+### Number Utilities
+
+```js
+import { clamp } from 'super-utils-plus';
+
+// Constrain a number to an inclusive range
+clamp(-10, -5, 5);  // => -5
+clamp(10, -5, 5);   // => 5
+clamp(3, -5, 5);    // => 3
+```
+
 ### Random Utilities
 
 ```js
-import { random, randomInt, randomString, randomUUID } from 'super-utils';
+import { random, randomInt, randomString, randomUUID } from 'super-utils-plus';
 
 // Generate a random number between min and max
 random(1, 10);  // => 4.237...
@@ -184,10 +205,10 @@ For optimal bundle size, import only what you need:
 
 ```js
 // Import only what you need from specific modules
-import { chunk, difference } from 'super-utils/array';
-import { get } from 'super-utils/object';
-import { debounce } from 'super-utils/function';
-import { isArray } from 'super-utils/utils';
+import { chunk, difference } from 'super-utils-plus/array';
+import { get } from 'super-utils-plus/object';
+import { debounce } from 'super-utils-plus/function';
+import { isArray } from 'super-utils-plus/utils';
 ```
 
 ## TypeScript Support
@@ -195,7 +216,7 @@ import { isArray } from 'super-utils/utils';
 SuperUtilsPlus is written in TypeScript and provides full type definitions:
 
 ```ts
-import { get } from 'super-utils';
+import { get } from 'super-utils-plus';
 
 interface User {
   name: string;

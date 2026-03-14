@@ -1,10 +1,36 @@
 {
   "name": "super-utils-plus",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A superior alternative to Lodash with improved performance, TypeScript support, and developer experience",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./array": {
+      "types": "./dist/array/index.d.ts",
+      "default": "./dist/array/index.js"
+    },
+    "./object": {
+      "types": "./dist/object/index.d.ts",
+      "default": "./dist/object/index.js"
+    },
+    "./string": {
+      "types": "./dist/string/index.d.ts",
+      "default": "./dist/string/index.js"
+    },
+    "./function": {
+      "types": "./dist/function/index.d.ts",
+      "default": "./dist/function/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest",
@@ -17,12 +43,21 @@
   },
   "keywords": [
     "utility",
+    "utilities",
     "functional",
     "lodash",
+    "lodash-alternative",
+    "typescript",
+    "javascript",
+    "node",
     "array",
     "object",
     "string",
     "function",
+    "debounce",
+    "throttle",
+    "range",
+    "clamp",
     "performance"
   ],
   "author": "",
