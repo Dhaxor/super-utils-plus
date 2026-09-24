@@ -1,4 +1,4 @@
-import { isEqual } from '../utils/is';
+import { isEqual } from '../utils/is.js';
 
 /**
  * Creates an array of array values not included in the other given arrays.

@@ -1,4 +1,4 @@
-import { range, rangeRight } from '../../index';
+import { range, rangeRight } from '../../index.js';
 
 describe('range', () => {
   test('should create a range from 0 when only end is provided', () => {

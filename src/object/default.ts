@@ -1,4 +1,4 @@
-import { isObject, isNil } from '../utils/is';
+import { isObject, isNil } from '../utils/is.js';
 
 /**
  * Assigns own and inherited enumerable string keyed properties of source

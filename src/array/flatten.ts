@@ -1,4 +1,4 @@
-import { isArray } from '../utils/is';
+import { isArray } from '../utils/is.js';
 
 /**
  * Flattens array a single level deep.

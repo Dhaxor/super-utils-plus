@@ -1,4 +1,4 @@
-import { isObject } from '../utils/is';
+import { isObject } from '../utils/is.js';
 
 /**
  * Creates an object composed of the inverted keys and values of object.

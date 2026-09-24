@@ -1,5 +1,5 @@
-import { isArray, isObject } from '../utils/is';
-import { DeepPartial } from '../utils/types';
+import { isArray, isObject } from '../utils/is.js';
+import { DeepPartial } from '../utils/types.js';
 
 /**
  * Recursively merges own and inherited enumerable string keyed properties of source

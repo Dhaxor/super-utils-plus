@@ -1,4 +1,4 @@
-import { isObject } from '../utils/is';
+import { isObject } from '../utils/is.js';
 
 /**
  * Checks if path is a direct property of object.

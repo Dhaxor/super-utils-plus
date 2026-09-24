@@ -1,4 +1,4 @@
-import { isObject } from '../utils/is';
+import { isObject } from '../utils/is.js';
 
 /**
  * Assigns own enumerable string keyed properties of source objects to the

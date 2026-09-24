@@ -1,4 +1,4 @@
-import { drop, dropRight, dropWhile, dropRightWhile } from '../drop';
+import { drop, dropRight, dropWhile, dropRightWhile } from '../drop.js';
 
 describe('drop', () => {
   test('should drop first element by default', () => {

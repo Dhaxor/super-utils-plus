@@ -1,4 +1,4 @@
-import { fromPairs } from '../../index';
+import { fromPairs } from '../../index.js';
 
 describe('fromPairs', () => {
   test('should create an object from key-value pairs', () => {

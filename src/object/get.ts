@@ -1,5 +1,5 @@
-import { isNil, isString, isArray } from '../utils/is';
-import { PropertyPath } from '../utils/types';
+import { isNil, isString, isArray } from '../utils/is.js';
+import { PropertyPath } from '../utils/types.js';
 
 /**
  * Gets the value at path of object. If the resolved value is undefined, the defaultValue is returned.

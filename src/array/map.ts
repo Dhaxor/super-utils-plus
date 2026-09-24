@@ -1,5 +1,5 @@
-import { isArray, isObject } from '../utils/is';
-import { flatten, flattenDeep } from './flatten';
+import { isArray, isObject } from '../utils/is.js';
+import { flatten, flattenDeep } from './flatten.js';
 
 /**
  * Creates an array of values by running each element in collection through iteratee.

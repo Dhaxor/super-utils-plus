@@ -1,14 +1,14 @@
 // Array utilities
-export * from './array';
+export * from './array/index.js';
 
 // Object utilities
-export * from './object';
+export * from './object/index.js';
 
 // String utilities
-export * from './string';
+export * from './string/index.js';
 
 // Function utilities
-export * from './function';
+export * from './function/index.js';
 
 // Utility functions
-export * from './utils';
+export * from './utils/index.js';

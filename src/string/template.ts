@@ -1,4 +1,4 @@
-import { TemplateOptions } from '../utils/types';
+import { TemplateOptions } from '../utils/types.js';
 
 /**
  * Creates a compiled template function that can interpolate data properties

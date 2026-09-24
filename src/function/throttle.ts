@@ -1,4 +1,4 @@
-import { ThrottleOptions } from '../utils/types';
+import { ThrottleOptions } from '../utils/types.js';
 
 /**
  * Creates a throttled function that only invokes func at most once per

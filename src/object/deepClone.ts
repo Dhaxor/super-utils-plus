@@ -1,4 +1,4 @@
-import { isArray, isDate, isObject, isRegExp } from '../utils/is';
+import { isArray, isDate, isObject, isRegExp } from '../utils/is.js';
 
 /**
  * Creates a deep clone of value.

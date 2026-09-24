@@ -1,5 +1,5 @@
-import { isArray, isNil, isString } from '../utils/is';
-import { PropertyPath } from '../utils/types';
+import { isArray, isNil, isString } from '../utils/is.js';
+import { PropertyPath } from '../utils/types.js';
 
 /**
  * Sets the value at path of object. If a portion of path doesn't exist, it's created.

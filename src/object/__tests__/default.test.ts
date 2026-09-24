@@ -1,4 +1,4 @@
-import { defaults, defaultsDeep } from '../../index';
+import { defaults, defaultsDeep } from '../../index.js';
 
 describe('defaults', () => {
   test('should assign source values for undefined properties only', () => {

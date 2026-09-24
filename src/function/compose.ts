@@ -1,4 +1,4 @@
-import { AnyFunction } from '../utils/types';
+import { AnyFunction } from '../utils/types.js';
 
 /**
  * Composes functions from right to left.

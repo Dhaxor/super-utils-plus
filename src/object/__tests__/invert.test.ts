@@ -1,4 +1,4 @@
-import { invert, invertBy } from '../../index';
+import { invert, invertBy } from '../../index.js';
 
 describe('invert', () => {
   test('should invert object keys and values', () => {

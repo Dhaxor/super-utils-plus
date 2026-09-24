@@ -1,4 +1,4 @@
-import { map, flatMap, flatMapDeep } from '../map';
+import { map, flatMap, flatMapDeep } from '../map.js';
 
 describe('map', () => {
   test('should map values using a function', () => {

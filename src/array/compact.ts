@@ -1,4 +1,4 @@
-import { isNil } from '../utils/is';
+import { isNil } from '../utils/is.js';
 
 /**
  * Creates an array with all falsy values removed.

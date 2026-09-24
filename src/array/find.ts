@@ -1,4 +1,4 @@
-import { isObject, isArray } from '../utils/is';
+import { isObject, isArray } from '../utils/is.js';
 
 /**
  * Iterates over elements of collection, returning the first element

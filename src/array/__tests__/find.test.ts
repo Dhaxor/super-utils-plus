@@ -1,4 +1,4 @@
-import { find, findLast, findIndex, findLastIndex } from '../find';
+import { find, findLast, findIndex, findLastIndex } from '../find.js';
 
 describe('find', () => {
   const users = [

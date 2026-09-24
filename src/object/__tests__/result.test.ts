@@ -1,4 +1,4 @@
-import { result } from '../../index';
+import { result } from '../../index.js';
 
 describe('result', () => {
   test('should return the resolved non-function value', () => {

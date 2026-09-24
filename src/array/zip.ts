@@ -1,4 +1,4 @@
-import { isArray } from '../utils/is';
+import { isArray } from '../utils/is.js';
 
 /**
  * Creates an array of grouped elements, the first of which contains the

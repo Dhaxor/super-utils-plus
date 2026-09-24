@@ -1,4 +1,4 @@
-import { chunk } from '../chunk';
+import { chunk } from '../chunk.js';
 
 describe('chunk', () => {
   test('should create chunks of the specified size', () => {

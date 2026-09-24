@@ -1,4 +1,4 @@
-import { DebounceOptions } from '../utils/types';
+import { DebounceOptions } from '../utils/types.js';
 
 /**
  * Creates a debounced function that delays invoking func until after wait

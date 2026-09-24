@@ -1,4 +1,4 @@
-import { randomInt } from '../utils/random';
+import { randomInt } from '../utils/random.js';
 
 /**
  * Creates an array of shuffled values using a version of the Fisher-Yates shuffle.

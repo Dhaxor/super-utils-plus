@@ -1,5 +1,5 @@
-import { isArray, isFunction, isNil, isString } from '../utils/is';
-import { PropertyPath } from '../utils/types';
+import { isArray, isFunction, isNil, isString } from '../utils/is.js';
+import { PropertyPath } from '../utils/types.js';
 
 /**
  * Resolves the value at path of object. If the resolved value is a function

@@ -1,4 +1,4 @@
-import { pad, padEnd, padStart } from '../../index';
+import { pad, padEnd, padStart } from '../../index.js';
 
 describe('pad', () => {
   test('should pad both sides with spaces by default', () => {

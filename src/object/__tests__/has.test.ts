@@ -1,4 +1,4 @@
-import { has, hasIn, hasPath, hasInPath } from '../has';
+import { has, hasIn, hasPath, hasInPath } from '../has.js';
 
 describe('has', () => {
   test('should check if object has a direct property', () => {

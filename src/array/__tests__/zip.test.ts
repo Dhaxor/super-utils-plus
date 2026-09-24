@@ -1,4 +1,4 @@
-import { zip, unzip, zipObject, zipObjectDeep, zipWith, unzipWith } from '../zip';
+import { zip, unzip, zipObject, zipObjectDeep, zipWith, unzipWith } from '../zip.js';
 
 describe('zip', () => {
   test('should zip arrays together', () => {

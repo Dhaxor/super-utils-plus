@@ -1,4 +1,4 @@
-import { assign, assignIn, assignWith, assignInWith, extend, extendWith } from '../assign';
+import { assign, assignIn, assignWith, assignInWith, extend, extendWith } from '../assign.js';
 
 describe('assign', () => {
   test('should assign source properties to destination object', () => {

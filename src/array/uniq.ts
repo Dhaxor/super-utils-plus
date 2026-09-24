@@ -1,4 +1,4 @@
-import { isEqual } from '../utils/is';
+import { isEqual } from '../utils/is.js';
 
 /**
  * Creates a duplicate-free version of an array, using SameValueZero for equality comparisons.

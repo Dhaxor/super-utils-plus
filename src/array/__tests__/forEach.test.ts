@@ -1,4 +1,4 @@
-import { forEach, forEachRight, each, eachRight } from '../forEach';
+import { forEach, forEachRight, each, eachRight } from '../forEach.js';
 
 describe('forEach', () => {
   test('should iterate over array elements', () => {

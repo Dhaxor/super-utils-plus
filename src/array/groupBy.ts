@@ -1,4 +1,4 @@
-import { isFunction } from '../utils/is';
+import { isFunction } from '../utils/is.js';
 
 /**
  * Creates an object composed of keys generated from the results of running each element

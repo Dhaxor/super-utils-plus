@@ -1,4 +1,4 @@
-import { sample, sampleSize, shuffle } from '../../index';
+import { sample, sampleSize, shuffle } from '../../index.js';
 
 describe('shuffle', () => {
   afterEach(() => {

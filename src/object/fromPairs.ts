@@ -1,4 +1,4 @@
-import { PropertyName } from '../utils/types';
+import { PropertyName } from '../utils/types.js';
 
 /**
  * Creates an object from key-value pairs.

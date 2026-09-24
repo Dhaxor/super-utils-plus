@@ -1,4 +1,4 @@
-import { isNil, isNumber, isEqual } from '../is';
+import { isNil, isNumber, isEqual } from '../is.js';
 
 describe('Type checking functions', () => {
   describe('isNil', () => {

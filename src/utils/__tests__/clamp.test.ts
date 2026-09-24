@@ -1,4 +1,4 @@
-import { clamp } from '../../index';
+import { clamp } from '../../index.js';
 
 describe('clamp', () => {
   test('should return the value when it is within bounds', () => {
