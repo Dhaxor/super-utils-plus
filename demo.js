@@ -1,28 +1,81 @@
-// This is a comprehensive demo of the SuperUtilsPlus library
-// When the library is properly built, you can run this file with Node.js
+// A quick tour of SuperUtilsPlus. Build the library first, then run:
+//
+//   npm run build && npm run demo
+//
+// The demo consumes the package exactly as a CommonJS user would.
 
-// Import utility functions
-const { 
+let utils;
+try {
+  utils = require('.');
+} catch (error) {
+  console.error('Could not load the built package. Run `npm run build` first.');
+  console.error(error.message);
+  process.exit(1);
+}
+
+const {
   // Array utilities
-  chunk, compact, compactNil, difference, differenceDeep, flatten, flattenDeep,
-  intersection, intersectionDeep, union, unionDeep, uniq, uniqDeep, groupBy,
-  
+  chunk,
+  compact,
+  compactNil,
+  difference,
+  differenceDeep,
+  flatten,
+  flattenDeep,
+  intersection,
+  intersectionDeep,
+  union,
+  unionDeep,
+  uniq,
+  uniqDeep,
+  groupBy,
+
   // Object utilities
-  get, set, pick, pickBy, omit, omitBy, merge, deepClone,
-  
+  get,
+  set,
+  pick,
+  pickBy,
+  omit,
+  omitBy,
+  merge,
+  deepClone,
+
   // String utilities
-  camelCase, kebabCase, snakeCase, capitalize, titleCase, 
-  trim, trimStart, trimEnd, truncate, template,
-  
+  camelCase,
+  kebabCase,
+  snakeCase,
+  capitalize,
+  titleCase,
+  trim,
+  trimStart,
+  trimEnd,
+  truncate,
+  template,
+
   // Function utilities
-  debounce, throttle, memoize, curry, partial, compose, pipe,
-  
+  debounce,
+  throttle,
+  memoize,
+  curry,
+  partial,
+  compose,
+  pipe,
+
   // Type checking
-  isNumber, isString, isObject, isArray, isPlainObject, isEqual, isNil,
-  
+  isNumber,
+  isString,
+  isObject,
+  isArray,
+  isPlainObject,
+  isEqual,
+  isNil,
+
   // Random utilities
-  random, randomInt, randomString, randomUUID
-} = require('./src');
+  random,
+  randomInt,
+  randomString,
+  randomUUID,
+} = utils;
 
 console.log('=== SuperUtilsPlus Demo ===');
 console.log('A modern alternative to Lodash with improved TypeScript support and performance');
@@ -54,12 +107,15 @@ console.log('flatten([1, [2, [3, [4]], 5]]):', flatten([1, [2, [3, [4]], 5]]));
 console.log('flattenDeep([1, [2, [3, [4]], 5]]):', flattenDeep([1, [2, [3, [4]], 5]]));
 
 const users = [
-  { 'user': 'barney', 'age': 36, 'active': true },
-  { 'user': 'fred', 'age': 40, 'active': false },
-  { 'user': 'pebbles', 'age': 1, 'active': true }
+  { user: 'barney', age: 36, active: true },
+  { user: 'fred', age: 40, active: false },
+  { user: 'pebbles', age: 1, active: true },
 ];
 console.log('groupBy by active status:', groupBy(users, 'active'));
-console.log('groupBy by age range:', groupBy(users, user => Math.floor(user.age / 10) * 10 + 's'));
+console.log(
+  'groupBy by age range:',
+  groupBy(users, user => Math.floor(user.age / 10) * 10 + 's')
+);
 
 // Demo: Object utilities
 console.log('\n=== Object Utilities ===');
@@ -77,13 +133,22 @@ console.log("set({}, 'a.b[0].c', 3):", set({}, 'a.b[0].c', 3));
 const pickOmitObj = { a: 1, b: 2, c: 3, d: 4 };
 console.log('pick({ a: 1, b: 2, c: 3, d: 4 }, ["a", "c"]):', pick(pickOmitObj, ['a', 'c']));
 console.log('omit({ a: 1, b: 2, c: 3, d: 4 }, ["a", "c"]):', omit(pickOmitObj, ['a', 'c']));
-console.log('pickBy({ a: 1, b: 2, c: 3, d: 4 }, x => x % 2 === 1):', pickBy(pickOmitObj, x => x % 2 === 1));
-console.log('omitBy({ a: 1, b: 2, c: 3, d: 4 }, x => x % 2 === 1):', omitBy(pickOmitObj, x => x % 2 === 1));
+console.log(
+  'pickBy({ a: 1, b: 2, c: 3, d: 4 }, x => x % 2 === 1):',
+  pickBy(pickOmitObj, x => x % 2 === 1)
+);
+console.log(
+  'omitBy({ a: 1, b: 2, c: 3, d: 4 }, x => x % 2 === 1):',
+  omitBy(pickOmitObj, x => x % 2 === 1)
+);
 
 // Merge
 const mergeObj1 = { a: 1, b: { c: 2 } };
 const mergeObj2 = { b: { d: 3 }, e: 4 };
-console.log('merge({ a: 1, b: { c: 2 } }, { b: { d: 3 }, e: 4 }):', merge({ ...mergeObj1 }, mergeObj2));
+console.log(
+  'merge({ a: 1, b: { c: 2 } }, { b: { d: 3 }, e: 4 }):',
+  merge({ ...mergeObj1 }, mergeObj2)
+);
 
 // Deep Clone
 const original = { a: 1, b: { c: 2, d: [1, 2] } };
@@ -187,5 +252,7 @@ console.log('randomString(10):', randomString(10));
 console.log('randomUUID():', randomUUID());
 
 console.log('\n=== End of Demo ===');
-console.log('SuperUtilsPlus provides a comprehensive set of utilities for modern JavaScript development');
+console.log(
+  'SuperUtilsPlus provides a comprehensive set of utilities for modern JavaScript development'
+);
 console.log('with improved TypeScript support, better performance, and more intuitive API design.');
