@@ -5,21 +5,21 @@ import { isObject } from '../utils/is';
  * running each own enumerable string keyed property of object through
  * iteratee. The iteratee is invoked with three arguments:
  * (value, key, object).
- * 
+ *
  * @param object - The object to iterate over
  * @param iteratee - The function invoked per iteration
  * @returns The new mapped object
- * 
+ *
  * @example
  * ```ts
  * const users = {
  *   'fred':    { 'user': 'fred',    'age': 40 },
  *   'pebbles': { 'user': 'pebbles', 'age': 1 }
  * };
- * 
+ *
  * mapValues(users, function(o) { return o.age; });
  * // => { 'fred': 40, 'pebbles': 1 } (iteration order is not guaranteed)
- * 
+ *
  * // The `_.property` iteratee shorthand.
  * mapValues(users, 'age');
  * // => { 'fred': 40, 'pebbles': 1 } (iteration order is not guaranteed)
@@ -32,27 +32,27 @@ export function mapValues<T extends object, R>(
   if (!isObject(object)) {
     return {} as Record<string, R>;
   }
-  
+
   // Convert iteratee to a function if it's a string
   let iterateeFn: (value: any, key: string, object: T) => R;
-  
+
   if (typeof iteratee === 'string') {
     const key = iteratee;
     iterateeFn = (value: any) => {
-      return isObject(value) ? value[key] as R : undefined as any;
+      return isObject(value) ? (value[key] as R) : (undefined as any);
     };
   } else {
     iterateeFn = iteratee;
   }
-  
+
   const result: Record<string, R> = {};
-  
+
   for (const key in object) {
     if (Object.prototype.hasOwnProperty.call(object, key)) {
       result[key] = iterateeFn((object as any)[key], key, object);
     }
   }
-  
+
   return result;
 }
 
@@ -61,11 +61,11 @@ export function mapValues<T extends object, R>(
  * by running each own enumerable string keyed property of object through
  * iteratee. The iteratee is invoked with three arguments:
  * (value, key, object).
- * 
+ *
  * @param object - The object to iterate over
  * @param iteratee - The function invoked per iteration
  * @returns The new mapped object
- * 
+ *
  * @example
  * ```ts
  * mapKeys({ 'a': 1, 'b': 2 }, function(value, key) {
@@ -81,9 +81,9 @@ export function mapKeys<T extends object>(
   if (!isObject(object)) {
     return {} as Record<string, any>;
   }
-  
+
   const result: Record<string, any> = {};
-  
+
   for (const key in object) {
     if (Object.prototype.hasOwnProperty.call(object, key)) {
       const value = (object as any)[key];
@@ -91,6 +91,6 @@ export function mapKeys<T extends object>(
       result[newKey] = value;
     }
   }
-  
+
   return result;
 }

@@ -56,9 +56,10 @@ function normalizeRangeArgs(start: number, end?: number, step?: number) {
 }
 
 function createRange(start: number, end: number, step: number, fromRight = false): number[] {
-  const length = step === 0
-    ? Math.max(Math.ceil(Math.abs(end - start)), 0)
-    : Math.max(Math.ceil((end - start) / step), 0);
+  const length =
+    step === 0
+      ? Math.max(Math.ceil(Math.abs(end - start)), 0)
+      : Math.max(Math.ceil((end - start) / step), 0);
 
   const result = new Array<number>(length);
 

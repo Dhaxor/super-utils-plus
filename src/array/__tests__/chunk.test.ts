@@ -2,7 +2,10 @@ import { chunk } from '../chunk';
 
 describe('chunk', () => {
   test('should create chunks of the specified size', () => {
-    expect(chunk([1, 2, 3, 4], 2)).toEqual([[1, 2], [3, 4]]);
+    expect(chunk([1, 2, 3, 4], 2)).toEqual([
+      [1, 2],
+      [3, 4],
+    ]);
     expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
   });
 

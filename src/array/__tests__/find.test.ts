@@ -4,7 +4,7 @@ describe('find', () => {
   const users = [
     { user: 'barney', age: 36, active: true },
     { user: 'fred', age: 40, active: false },
-    { user: 'pebbles', age: 1, active: true }
+    { user: 'pebbles', age: 1, active: true },
   ];
 
   test('should find an element using a function predicate', () => {
@@ -41,7 +41,7 @@ describe('findLast', () => {
   const users = [
     { user: 'barney', age: 36, active: true },
     { user: 'fred', age: 40, active: false },
-    { user: 'pebbles', age: 1, active: true }
+    { user: 'pebbles', age: 1, active: true },
   ];
 
   test('should find the last element using a function predicate', () => {
@@ -78,7 +78,7 @@ describe('findIndex', () => {
   const users = [
     { user: 'barney', age: 36, active: true },
     { user: 'fred', age: 40, active: false },
-    { user: 'pebbles', age: 1, active: true }
+    { user: 'pebbles', age: 1, active: true },
   ];
 
   test('should find the index using a function predicate', () => {
@@ -115,7 +115,7 @@ describe('findLastIndex', () => {
   const users = [
     { user: 'barney', age: 36, active: true },
     { user: 'fred', age: 40, active: false },
-    { user: 'pebbles', age: 1, active: true }
+    { user: 'pebbles', age: 1, active: true },
   ];
 
   test('should find the last index using a function predicate', () => {

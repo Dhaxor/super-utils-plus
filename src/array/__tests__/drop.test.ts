@@ -44,7 +44,7 @@ describe('dropWhile', () => {
     const users = [
       { user: 'barney', active: false },
       { user: 'fred', active: false },
-      { user: 'pebbles', active: true }
+      { user: 'pebbles', active: true },
     ];
     expect(dropWhile(users, o => !o.active)).toEqual([{ user: 'pebbles', active: true }]);
   });
@@ -65,7 +65,7 @@ describe('dropRightWhile', () => {
     const users = [
       { user: 'barney', active: true },
       { user: 'fred', active: false },
-      { user: 'pebbles', active: false }
+      { user: 'pebbles', active: false },
     ];
     expect(dropRightWhile(users, o => !o.active)).toEqual([{ user: 'barney', active: true }]);
   });
