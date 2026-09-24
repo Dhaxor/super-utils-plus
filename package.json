@@ -2,43 +2,88 @@
   "name": "super-utils-plus",
   "version": "1.1.0",
   "description": "A superior alternative to Lodash with improved performance, TypeScript support, and developer experience",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     },
     "./array": {
-      "types": "./dist/array/index.d.ts",
-      "default": "./dist/array/index.js"
+      "import": {
+        "types": "./dist/esm/array/index.d.ts",
+        "default": "./dist/esm/array/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/array/index.d.ts",
+        "default": "./dist/cjs/array/index.js"
+      }
     },
     "./object": {
-      "types": "./dist/object/index.d.ts",
-      "default": "./dist/object/index.js"
+      "import": {
+        "types": "./dist/esm/object/index.d.ts",
+        "default": "./dist/esm/object/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/object/index.d.ts",
+        "default": "./dist/cjs/object/index.js"
+      }
     },
     "./string": {
-      "types": "./dist/string/index.d.ts",
-      "default": "./dist/string/index.js"
+      "import": {
+        "types": "./dist/esm/string/index.d.ts",
+        "default": "./dist/esm/string/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/string/index.d.ts",
+        "default": "./dist/cjs/string/index.js"
+      }
     },
     "./function": {
-      "types": "./dist/function/index.d.ts",
-      "default": "./dist/function/index.js"
+      "import": {
+        "types": "./dist/esm/function/index.d.ts",
+        "default": "./dist/esm/function/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/function/index.d.ts",
+        "default": "./dist/cjs/function/index.js"
+      }
     },
     "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "default": "./dist/utils/index.js"
+      "import": {
+        "types": "./dist/esm/utils/index.d.ts",
+        "default": "./dist/esm/utils/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/utils/index.d.ts",
+        "default": "./dist/cjs/utils/index.js"
+      }
     },
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
-    "build": "tsc",
+    "build": "node scripts/build.mjs",
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test:coverage",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
+    "prepublishOnly": "npm run check",
     "demo": "node demo.js"
   },
   "keywords": [
@@ -62,6 +107,17 @@
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhaxor/super-utils-plus.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhaxor/super-utils-plus/issues"
+  },
+  "homepage": "https://github.com/dhaxor/super-utils-plus#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.3",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -71,20 +127,5 @@
     "prettier": "^3.0.0",
     "ts-jest": "^29.1.1",
     "typescript": "^5.1.6"
-  },
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "sideEffects": false,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dhaxor/super-utils-plus.git"
-  },
-  "bugs": {
-    "url": "https://github.com/dhaxor/super-utils-plus/issues"
-  },
-  "homepage": "https://github.com/Dhaxor/super-utils-plus/blob/master/README.md"
+  }
 }
