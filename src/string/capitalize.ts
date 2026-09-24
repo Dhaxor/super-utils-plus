@@ -45,7 +45,8 @@ export function capitalizeFirst(string: string): string {
 }
 
 /**
- * Converts the first character of each word in the string to upper case.
+ * Converts the first character of each word in the string to upper case,
+ * leaving everything else (including punctuation and spacing) unchanged.
  *
  * @param string - The string to convert
  * @returns The title cased string
@@ -61,5 +62,6 @@ export function titleCase(string: string): string {
     return '';
   }
 
-  return string.replace(/\\b\\w/g, match => match.toUpperCase());
+  // A letter that is not preceded by another letter, digit, or apostrophe starts a word
+  return string.replace(/(?<![\p{L}\p{N}'’])\p{L}/gu, match => match.toUpperCase());
 }

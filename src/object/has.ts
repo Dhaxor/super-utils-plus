@@ -1,7 +1,15 @@
-import { isObject } from '../utils/is.js';
+import { isNil } from '../utils/is.js';
+import { PropertyPath } from '../utils/types.js';
+import { toPath } from '../internal/path.js';
+
+const hasOwn = (object: unknown, key: string | number | symbol): boolean =>
+  !isNil(object) && Object.prototype.hasOwnProperty.call(object, key);
+
+const hasInherited = (object: unknown, key: string | number | symbol): boolean =>
+  !isNil(object) && key in Object(object);
 
 /**
- * Checks if path is a direct property of object.
+ * Checks if key is a direct (own) property of object.
  *
  * @param object - The object to query
  * @param key - The key to check
@@ -19,15 +27,11 @@ import { isObject } from '../utils/is.js';
  * ```
  */
 export function has<T extends object>(object: T, key: string | number | symbol): boolean {
-  if (!isObject(object)) {
-    return false;
-  }
-
-  return Object.prototype.hasOwnProperty.call(object, key);
+  return hasOwn(object, key);
 }
 
 /**
- * Checks if path is a direct or inherited property of object.
+ * Checks if key is a direct or inherited property of object.
  *
  * @param object - The object to query
  * @param key - The key to check
@@ -49,16 +53,12 @@ export function has<T extends object>(object: T, key: string | number | symbol):
  * ```
  */
 export function hasIn<T extends object>(object: T, key: string | number | symbol): boolean {
-  if (!isObject(object)) {
-    return false;
-  }
-
-  return key in object;
+  return hasInherited(object, key);
 }
 
 /**
- * Checks if path is a direct property of object.
- * Uses dot notation for nested properties.
+ * Checks if path is a direct (own) property path of object.
+ * Supports dot and bracket notation as well as array paths.
  *
  * @param object - The object to query
  * @param path - The path to check
@@ -75,38 +75,13 @@ export function hasIn<T extends object>(object: T, key: string | number | symbol
  * // => true
  * ```
  */
-export function hasPath<T extends object>(
-  object: T,
-  path: string | Array<string | number | symbol>
-): boolean {
-  if (!isObject(object)) {
-    return false;
-  }
-
-  const segments = typeof path === 'string' ? path.split('.') : path;
-
-  if (!segments.length) {
-    return false;
-  }
-
-  let current: any = object;
-
-  for (let i = 0; i < segments.length; i++) {
-    const key = segments[i];
-
-    if (!isObject(current) || !Object.prototype.hasOwnProperty.call(current, key)) {
-      return false;
-    }
-
-    current = current[key as keyof typeof current];
-  }
-
-  return true;
+export function hasPath<T extends object>(object: T, path: PropertyPath): boolean {
+  return checkPath(object, path, hasOwn);
 }
 
 /**
- * Checks if path is a direct or inherited property of object.
- * Uses dot notation for nested properties.
+ * Checks if path is a direct or inherited property path of object.
+ * Supports dot and bracket notation as well as array paths.
  *
  * @param object - The object to query
  * @param path - The path to check
@@ -123,15 +98,20 @@ export function hasPath<T extends object>(
  * // => true
  * ```
  */
-export function hasInPath<T extends object>(
-  object: T,
-  path: string | Array<string | number | symbol>
+export function hasInPath<T extends object>(object: T, path: PropertyPath): boolean {
+  return checkPath(object, path, hasInherited);
+}
+
+function checkPath(
+  object: unknown,
+  path: PropertyPath,
+  check: (object: unknown, key: string | number | symbol) => boolean
 ): boolean {
-  if (!isObject(object)) {
+  if (isNil(object)) {
     return false;
   }
 
-  const segments = typeof path === 'string' ? path.split('.') : path;
+  const segments = toPath(path);
 
   if (!segments.length) {
     return false;
@@ -139,15 +119,13 @@ export function hasInPath<T extends object>(
 
   let current: any = object;
 
-  for (let i = 0; i < segments.length - 1; i++) {
-    const key = segments[i];
-
-    if (!isObject(current) || !(key in current)) {
+  for (const segment of segments) {
+    if (!check(current, segment)) {
       return false;
     }
 
-    current = current[key as keyof typeof current];
+    current = current[segment];
   }
 
-  return segments[segments.length - 1] in current;
+  return true;
 }

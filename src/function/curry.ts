@@ -30,17 +30,12 @@ export function curry<T extends (...args: any[]) => any>(
   func: T,
   arity: number = func.length
 ): (...args: any[]) => any {
-  // Return a recursive function that collects arguments
   function curried(this: any, ...args: any[]): any {
-    // If we have enough args, call the original function
     if (args.length >= arity) {
       return func.apply(this, args);
     }
 
-    // Otherwise, return a function that collects more args
-    return (...moreArgs: any[]) => {
-      return curried.apply(this, [...args, ...moreArgs]);
-    };
+    return (...moreArgs: any[]) => curried.apply(this, [...args, ...moreArgs]);
   }
 
   return curried;
@@ -48,7 +43,8 @@ export function curry<T extends (...args: any[]) => any>(
 
 /**
  * This method is like `curry` except that arguments are applied to func in the
- * manner of `partialRight` instead of `partial`.
+ * manner of `partialRight` instead of `partial`: each call's arguments are
+ * prepended to those collected so far.
  *
  * @param func - The function to curry
  * @param arity - The arity of func
@@ -76,18 +72,12 @@ export function curryRight<T extends (...args: any[]) => any>(
   func: T,
   arity: number = func.length
 ): (...args: any[]) => any {
-  // Return a recursive function that collects arguments from right to left
   function curried(this: any, ...args: any[]): any {
-    // If we have enough args, call the original function with reversed args
     if (args.length >= arity) {
-      // Apply the arguments in reverse order
-      return func.apply(this, args.reverse().slice(0, arity).reverse());
+      return func.apply(this, args);
     }
 
-    // Otherwise, return a function that collects more args
-    return (...moreArgs: any[]) => {
-      return curried.apply(this, [...args, ...moreArgs]);
-    };
+    return (...moreArgs: any[]) => curried.apply(this, [...moreArgs, ...args]);
   }
 
   return curried;

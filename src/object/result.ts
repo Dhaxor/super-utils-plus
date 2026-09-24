@@ -1,21 +1,41 @@
-import { isArray, isFunction, isNil, isString } from '../utils/is.js';
+import { isFunction, isNil } from '../utils/is.js';
 import { PropertyPath } from '../utils/types.js';
+import { toPath } from '../internal/path.js';
 
 /**
  * Resolves the value at path of object. If the resolved value is a function
- * it's invoked with the `this` binding of its parent object.
+ * it's invoked with the `this` binding of its parent object. If the resolved
+ * value is undefined and `defaultValue` is a function, it's invoked and its
+ * result returned.
  *
  * @param object - The object to query
  * @param path - The path of the property to resolve
  * @param defaultValue - The value returned for undefined resolved values
  * @returns The resolved value
+ *
+ * @example
+ * ```ts
+ * const object = { 'a': [{ 'b': { 'c1': 3, 'c2': () => 4 } }] };
+ *
+ * result(object, 'a[0].b.c1');
+ * // => 3
+ *
+ * result(object, 'a[0].b.c2');
+ * // => 4
+ *
+ * result(object, 'a[0].b.c3', 'default');
+ * // => 'default'
+ *
+ * result(object, 'a[0].b.c3', () => 'default');
+ * // => 'default'
+ * ```
  */
 export function result<T = any>(object: any, path: PropertyPath, defaultValue?: T): T | undefined {
   if (isNil(object)) {
     return resolveDefaultValue(defaultValue, undefined);
   }
 
-  const segments = normalizePath(path);
+  const segments = toPath(path);
 
   if (!segments.length) {
     return object;
@@ -40,57 +60,6 @@ export function result<T = any>(object: any, path: PropertyPath, defaultValue?: 
   return isFunction(current) ? current.call(parent) : current;
 }
 
-function normalizePath(path: PropertyPath): Array<string | number | symbol> {
-  if (isString(path)) {
-    return parsePath(path);
-  }
-
-  if (isArray(path)) {
-    return path as Array<string | number | symbol>;
-  }
-
-  return [path as string | number | symbol];
-}
-
 function resolveDefaultValue<T>(value: T, thisArg: any): T {
   return isFunction(value) ? value.call(thisArg) : value;
-}
-
-function parsePath(path: string): Array<string | number> {
-  const segments: Array<string | number> = [];
-  let currentSegment = '';
-  let inBrackets = false;
-
-  for (let index = 0; index < path.length; index++) {
-    const character = path[index];
-
-    if (character === '[') {
-      if (currentSegment) {
-        segments.push(currentSegment);
-        currentSegment = '';
-      }
-      inBrackets = true;
-    } else if (character === ']') {
-      if (/^\d+$/.test(currentSegment)) {
-        segments.push(parseInt(currentSegment, 10));
-      } else {
-        segments.push(currentSegment);
-      }
-      currentSegment = '';
-      inBrackets = false;
-    } else if (character === '.' && !inBrackets) {
-      if (currentSegment) {
-        segments.push(currentSegment);
-        currentSegment = '';
-      }
-    } else {
-      currentSegment += character;
-    }
-  }
-
-  if (currentSegment) {
-    segments.push(currentSegment);
-  }
-
-  return segments;
 }

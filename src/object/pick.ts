@@ -1,3 +1,4 @@
+import { assignOwnKey } from '../internal/path.js';
 /**
  * Creates an object composed of the picked object properties.
  *
@@ -25,7 +26,7 @@ export function pick<T extends object, K extends keyof T>(
 
   for (const path of paths) {
     if (Object.prototype.hasOwnProperty.call(object, path)) {
-      result[path as K] = object[path as K];
+      assignOwnKey(result, path as PropertyKey, object[path as K]);
     }
   }
 
@@ -61,7 +62,7 @@ export function pickBy<T extends object>(
     if (Object.prototype.hasOwnProperty.call(object, key)) {
       const value = object[key];
       if (predicate(value, key)) {
-        result[key as keyof T] = value;
+        assignOwnKey(result, key, value);
       }
     }
   }

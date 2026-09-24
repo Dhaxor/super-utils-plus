@@ -6,3 +6,5 @@ export * from './pad.js';
 export * from './trim.js';
 export * from './truncate.js';
 export * from './template.js';
+export * from './words.js';
+export * from './deburr.js';

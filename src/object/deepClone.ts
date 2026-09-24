@@ -1,9 +1,13 @@
-import { isArray, isDate, isObject, isRegExp } from '../utils/is.js';
+import { isArray, isDate, isRegExp } from '../utils/is.js';
+import { assignOwnKey } from '../internal/path.js';
 
 /**
  * Creates a deep clone of value.
- * Handles arrays, objects, dates, regexps, maps, sets, and primitive types.
- * Functions are referenced, not cloned.
+ *
+ * Handles primitives, arrays, plain objects, class instances (the prototype is
+ * preserved), `Date`, `RegExp`, `Map`, `Set`, `ArrayBuffer`, typed arrays, and
+ * circular references. Functions are returned by reference. Enumerable own string
+ * and symbol keys are copied.
  *
  * @param value - The value to clone
  * @returns The deep cloned value
@@ -18,58 +22,90 @@ import { isArray, isDate, isObject, isRegExp } from '../utils/is.js';
  * ```
  */
 export function deepClone<T>(value: T): T {
-  // Handle null, undefined, and primitive types
+  return cloneValue(value, new WeakMap());
+}
+
+function cloneValue<T>(value: T, seen: WeakMap<object, unknown>): T {
+  // Primitives and functions are returned as-is
   if (value === null || typeof value !== 'object') {
     return value;
   }
 
-  // Handle Dates
-  if (isDate(value)) {
-    return new Date((value as Date).getTime()) as unknown as T;
+  const source = value as unknown as object;
+  const existing = seen.get(source);
+  if (existing !== undefined) {
+    return existing as T;
   }
 
-  // Handle RegExps
+  if (isDate(value)) {
+    return new Date(value.getTime()) as unknown as T;
+  }
+
   if (isRegExp(value)) {
-    const flags = (value as RegExp).flags;
-    const result = new RegExp((value as RegExp).source, flags);
-    result.lastIndex = (value as RegExp).lastIndex;
+    const result = new RegExp(value.source, value.flags);
+    result.lastIndex = value.lastIndex;
     return result as unknown as T;
   }
 
-  // Handle Maps
+  if (value instanceof ArrayBuffer) {
+    return value.slice(0) as unknown as T;
+  }
+
+  // Node.js Buffer: Buffer.slice() shares memory and `new Buffer()` is deprecated
+  const BufferCtor = (globalThis as any).Buffer;
+  if (BufferCtor && BufferCtor.isBuffer(value)) {
+    return BufferCtor.from(value) as T;
+  }
+
+  if (ArrayBuffer.isView(value)) {
+    // DataView and every typed array
+    const view = value as unknown as ArrayBufferView;
+    const buffer = view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength);
+    const Ctor = view.constructor as new (buffer: ArrayBufferLike) => ArrayBufferView;
+    return new Ctor(buffer) as unknown as T;
+  }
+
   if (value instanceof Map) {
     const result = new Map();
-    (value as Map<any, any>).forEach((val, key) => {
-      result.set(deepClone(key), deepClone(val));
+    seen.set(source, result);
+    value.forEach((entryValue, key) => {
+      result.set(cloneValue(key, seen), cloneValue(entryValue, seen));
     });
     return result as unknown as T;
   }
 
-  // Handle Sets
   if (value instanceof Set) {
     const result = new Set();
-    (value as Set<any>).forEach(val => {
-      result.add(deepClone(val));
+    seen.set(source, result);
+    value.forEach(entry => {
+      result.add(cloneValue(entry, seen));
     });
     return result as unknown as T;
   }
 
-  // Handle Arrays
   if (isArray(value)) {
-    return (value as any[]).map(item => deepClone(item)) as unknown as T;
-  }
-
-  // Handle plain Objects
-  if (isObject(value)) {
-    const result: Record<string, any> = {};
-
-    Object.entries(value as Record<string, any>).forEach(([key, val]) => {
-      result[key] = deepClone(val);
-    });
-
+    const result: unknown[] = [];
+    seen.set(source, result);
+    for (let i = 0; i < value.length; i++) {
+      result[i] = cloneValue(value[i], seen);
+    }
     return result as unknown as T;
   }
 
-  // For other types like Functions, return as is
-  return value;
+  // Plain objects and class instances: preserve the prototype
+  const result = Object.create(Object.getPrototypeOf(source));
+  seen.set(source, result);
+
+  for (const key of Object.keys(source)) {
+    // assignOwnKey keeps an own "__proto__" key an own key on the clone
+    assignOwnKey(result, key, cloneValue((source as Record<string, unknown>)[key], seen));
+  }
+
+  for (const symbol of Object.getOwnPropertySymbols(source)) {
+    if (Object.prototype.propertyIsEnumerable.call(source, symbol)) {
+      result[symbol] = cloneValue((source as Record<symbol, unknown>)[symbol], seen);
+    }
+  }
+
+  return result as T;
 }

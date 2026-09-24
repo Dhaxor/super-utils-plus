@@ -1,4 +1,5 @@
-import { isArray } from '../utils/is.js';
+import { set } from '../object/set.js';
+import { assignOwnKey } from '../internal/path.js';
 
 /**
  * Creates an array of grouped elements, the first of which contains the
@@ -113,7 +114,7 @@ export function zipObject<T = any>(
 
   for (let i = 0; i < props.length; i++) {
     if (i < values.length) {
-      result[props[i]] = values[i];
+      assignOwnKey(result, props[i], values[i]);
     }
   }
 
@@ -122,6 +123,7 @@ export function zipObject<T = any>(
 
 /**
  * This method is like zipObject except that it supports property paths.
+ * Paths containing `__proto__`, `constructor`, or `prototype` are ignored.
  *
  * @param paths - The property paths
  * @param values - The property values
@@ -135,20 +137,13 @@ export function zipObject<T = any>(
  */
 export function zipObjectDeep<T = any>(paths: string[], values: T[]): Record<string, any> {
   if (!paths || !paths.length || !values) {
-    return {} as Record<string, any>;
+    return {};
   }
 
   const result: Record<string, any> = {};
 
-  for (let i = 0; i < paths.length; i++) {
-    if (i < values.length) {
-      // Parse the path string
-      const path = paths[i];
-      const pathParts = parsePath(path);
-
-      // Set the value at the path
-      setDeep(result, pathParts, values[i]);
-    }
+  for (let i = 0; i < paths.length && i < values.length; i++) {
+    set(result, paths[i], values[i]);
   }
 
   return result;
@@ -184,75 +179,4 @@ export function zipWith<T, R>(...args: [...arrays: T[][], iteratee: (...values: 
 
   // Apply the iteratee to each group
   return zipped.map(group => iteratee(...group));
-}
-
-/**
- * Helper function to parse a property path into an array of parts.
- */
-function parsePath(path: string): (string | number)[] {
-  const parts: (string | number)[] = [];
-  let currentPart = '';
-  let inBrackets = false;
-
-  for (let i = 0; i < path.length; i++) {
-    const char = path[i];
-
-    if (char === '[') {
-      if (currentPart) {
-        parts.push(currentPart);
-        currentPart = '';
-      }
-      inBrackets = true;
-    } else if (char === ']') {
-      if (/^\d+$/.test(currentPart)) {
-        parts.push(Number(currentPart));
-      } else {
-        parts.push(currentPart);
-      }
-      currentPart = '';
-      inBrackets = false;
-    } else if (char === '.' && !inBrackets) {
-      if (currentPart) {
-        parts.push(currentPart);
-        currentPart = '';
-      }
-    } else {
-      currentPart += char;
-    }
-  }
-
-  if (currentPart) {
-    parts.push(currentPart);
-  }
-
-  return parts;
-}
-
-/**
- * Helper function to set a value at a deep path in an object.
- */
-function setDeep(obj: Record<string, any>, path: (string | number)[], value: any): void {
-  if (!path.length) {
-    return;
-  }
-
-  const [head, ...tail] = path;
-
-  if (tail.length === 0) {
-    obj[head] = value;
-    return;
-  }
-
-  const nextIsNumber = typeof tail[0] === 'number';
-
-  if (!(head in obj)) {
-    obj[head] = nextIsNumber ? [] : {};
-  } else if (
-    (nextIsNumber && !isArray(obj[head])) ||
-    (!nextIsNumber && typeof obj[head] !== 'object')
-  ) {
-    obj[head] = nextIsNumber ? [] : {};
-  }
-
-  setDeep(obj[head], tail, value);
 }

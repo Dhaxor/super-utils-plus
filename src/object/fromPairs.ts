@@ -1,4 +1,5 @@
 import { PropertyName } from '../utils/types.js';
+import { assignOwnKey } from '../internal/path.js';
 
 /**
  * Creates an object from key-value pairs.
@@ -14,7 +15,7 @@ export function fromPairs<T = any>(pairs: Array<[PropertyName, T]>): Record<stri
   const result: Record<string, T> = {};
 
   for (const [key, value] of pairs) {
-    result[String(key)] = value;
+    assignOwnKey(result, String(key), value);
   }
 
   return result;

@@ -1,4 +1,6 @@
-import { isFunction } from '../utils/is.js';
+import { ValueIteratee } from '../utils/types.js';
+import { toValueIteratee } from '../internal/iteratee.js';
+import { assignOwnKey } from '../internal/path.js';
 
 /**
  * Creates an object composed of keys generated from the results of running each element
@@ -18,24 +20,19 @@ import { isFunction } from '../utils/is.js';
  * // => { '3': ['one', 'two'], '5': ['three'] }
  * ```
  */
-export function groupBy<T>(
-  array: T[],
-  iteratee: ((value: T) => string | number) | keyof T
-): Record<string, T[]> {
+export function groupBy<T>(array: T[], iteratee: ValueIteratee<T, unknown>): Record<string, T[]> {
   if (!array || !array.length) {
     return {};
   }
 
+  const iterateeFn = toValueIteratee(iteratee);
   const result: Record<string, T[]> = {};
-  const iterateeFn = isFunction(iteratee)
-    ? (iteratee as (value: T) => string | number)
-    : (obj: T) => String(obj[iteratee as keyof T]);
 
   for (const element of array) {
     const key = String(iterateeFn(element));
 
-    if (!result[key]) {
-      result[key] = [];
+    if (!Object.prototype.hasOwnProperty.call(result, key)) {
+      assignOwnKey(result, key, []);
     }
 
     result[key].push(element);

@@ -28,11 +28,12 @@ export function assign<T extends object, U extends object>(object: T, ...sources
 
 /**
  * This method is like assign except that it iterates over own and
- * inherited source properties.
+ * inherited source properties. Unlike assign, the destination object is not
+ * mutated: a shallow copy with the assigned properties is returned.
  *
  * @param object - The destination object
  * @param sources - The source objects
- * @returns The destination object
+ * @returns A new object with the assigned properties
  *
  * @example
  * ```ts
@@ -68,11 +69,12 @@ export function assignIn<T extends object, U extends object>(object: T, ...sourc
  * is invoked to produce the assigned values. If customizer returns undefined,
  * assignment is handled by the method instead. The customizer is invoked
  * with five arguments: (objValue, srcValue, key, object, source).
+ * The destination object is not mutated.
  *
  * @param object - The destination object
- * @param sources - The source objects
+ * @param source - The source object
  * @param customizer - The function to customize assigned values
- * @returns The destination object
+ * @returns A new object with the assigned properties
  *
  * @example
  * ```ts
@@ -119,11 +121,12 @@ export function assignWith<T extends object, U extends object>(
  * is invoked to produce the assigned values. If customizer returns undefined,
  * assignment is handled by the method instead. The customizer is invoked
  * with five arguments: (objValue, srcValue, key, object, source).
+ * The destination object is not mutated.
  *
  * @param object - The destination object
- * @param sources - The source objects
+ * @param source - The source object
  * @param customizer - The function to customize assigned values
- * @returns The destination object
+ * @returns A new object with the assigned properties
  *
  * @example
  * ```ts

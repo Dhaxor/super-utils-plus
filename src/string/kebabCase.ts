@@ -1,3 +1,5 @@
+import { compoundWords } from '../internal/words.js';
+
 /**
  * Converts string to kebab case.
  *
@@ -14,6 +16,9 @@
  *
  * kebabCase('__FOO_BAR__');
  * // => 'foo-bar'
+ *
+ * kebabCase('Crème Brûlée');
+ * // => 'creme-brulee'
  * ```
  */
 export function kebabCase(string: string): string {
@@ -21,13 +26,7 @@ export function kebabCase(string: string): string {
     return '';
   }
 
-  // Convert camelCase to kebab-case
-  const camelToKebab = string.replace(/([a-z0-9])([A-Z])/g, '$1-$2');
-
-  // Convert to lowercase and remove special characters
-  return camelToKebab
-    .toLowerCase()
-    .replace(/[\\s_]+/g, '-')
-    .replace(/[^a-z0-9\\-]/g, '')
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+  return compoundWords(string)
+    .map(word => word.toLowerCase())
+    .join('-');
 }

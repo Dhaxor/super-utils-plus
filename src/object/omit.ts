@@ -1,3 +1,4 @@
+import { assignOwnKey } from '../internal/path.js';
 /**
  * Creates an object composed of the own enumerable property paths of object that are not omitted.
  *
@@ -26,7 +27,7 @@ export function omit<T extends object, K extends keyof T>(
 
   for (const key in object) {
     if (Object.prototype.hasOwnProperty.call(object, key) && !pathSet.has(key as any)) {
-      result[key as unknown as keyof Omit<T, K>] = object[key] as any;
+      assignOwnKey(result, key, object[key]);
     }
   }
 
@@ -62,7 +63,7 @@ export function omitBy<T extends object>(
     if (Object.prototype.hasOwnProperty.call(object, key)) {
       const value = object[key];
       if (!predicate(value, key)) {
-        result[key as keyof T] = value;
+        assignOwnKey(result, key, value);
       }
     }
   }

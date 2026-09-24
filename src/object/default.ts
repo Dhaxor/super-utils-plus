@@ -1,14 +1,18 @@
-import { isObject, isNil } from '../utils/is.js';
+import { isObject } from '../utils/is.js';
+import { assignOwnKey, isUnsafeKey } from '../internal/path.js';
+import { deepClone } from './deepClone.js';
 
 /**
- * Assigns own and inherited enumerable string keyed properties of source
- * objects to the destination object for all destination properties that
- * resolve to undefined. Source objects are applied from left to right.
- * Once a property is set, additional values of the same property are ignored.
+ * Creates a new object from `object` and assigns own and inherited enumerable
+ * string keyed properties of source objects for all properties that resolve to
+ * undefined. Source objects are applied from left to right. Once a property is
+ * set, additional values of the same property are ignored.
+ *
+ * Neither `object` nor the sources are mutated.
  *
  * @param object - The destination object
  * @param sources - The source objects
- * @returns The destination object
+ * @returns The new object
  *
  * @example
  * ```ts
@@ -26,7 +30,7 @@ export function defaults<T extends object>(object: T, ...sources: Array<Partial<
   for (const source of sources) {
     if (isObject(source)) {
       for (const key in source) {
-        if ((result as any)[key] === undefined) {
+        if (!isUnsafeKey(key) && (result as any)[key] === undefined) {
           (result as any)[key] = (source as any)[key];
         }
       }
@@ -37,16 +41,19 @@ export function defaults<T extends object>(object: T, ...sources: Array<Partial<
 }
 
 /**
- * This method is like defaults except that it recursively assigns
- * default properties.
+ * This method is like `defaults` except that it recursively assigns default
+ * properties into nested plain objects.
+ *
+ * Neither `object` nor the sources are mutated: the result is a deep clone of
+ * `object` with defaults filled in, and values copied from sources are cloned.
  *
  * @param object - The destination object
  * @param sources - The source objects
- * @returns The destination object
+ * @returns The new object
  *
  * @example
  * ```ts
- * defaults({ 'a': { 'b': 2 } }, { 'a': { 'b': 1, 'c': 3 } });
+ * defaultsDeep({ 'a': { 'b': 2 } }, { 'a': { 'b': 1, 'c': 3 } });
  * // => { 'a': { 'b': 2, 'c': 3 } }
  * ```
  */
@@ -55,37 +62,31 @@ export function defaultsDeep<T extends object>(object: T, ...sources: Array<Part
     return object;
   }
 
-  const result = { ...object };
+  const result = deepClone(object);
 
   for (const source of sources) {
     if (isObject(source)) {
-      recursiveDefaults(result, source);
+      applyDefaults(result as Record<string, any>, source as Record<string, any>);
     }
   }
 
   return result;
 }
 
-/**
- * Helper function for recursive defaults assignment.
- */
-function recursiveDefaults(object: Record<string, any>, source: Record<string, any>): void {
+function applyDefaults(target: Record<string, any>, source: Record<string, any>): void {
+  // Own and inherited enumerable keys, like `defaults`
   for (const key in source) {
-    const objValue = object[key];
-    const srcValue = source[key];
-
-    // Skip non-own properties
-    if (!Object.prototype.hasOwnProperty.call(source, key)) {
+    if (isUnsafeKey(key)) {
       continue;
     }
 
-    // If property doesn't exist in object, assign it
-    if (isNil(objValue)) {
-      object[key] = srcValue;
-    }
-    // If both are objects, recurse
-    else if (isObject(objValue) && isObject(srcValue)) {
-      recursiveDefaults(objValue, srcValue);
+    const targetValue = target[key];
+    const sourceValue = source[key];
+
+    if (targetValue === undefined) {
+      assignOwnKey(target, key, deepClone(sourceValue));
+    } else if (isObject(targetValue) && isObject(sourceValue)) {
+      applyDefaults(targetValue, sourceValue);
     }
     // Otherwise keep the existing value
   }

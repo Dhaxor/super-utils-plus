@@ -2,7 +2,7 @@
  * Removes leading and trailing whitespace or specified characters from string.
  *
  * @param string - The string to trim
- * @param chars - The characters to trim
+ * @param chars - The characters to trim (whitespace when omitted; an empty string trims nothing)
  * @returns The trimmed string
  *
  * @example
@@ -19,13 +19,11 @@ export function trim(string: string, chars?: string): string {
     return '';
   }
 
-  if (!chars) {
+  if (chars == null) {
     return string.trim();
   }
 
-  // Create a regex pattern with the chars to trim
-  const pattern = new RegExp(`^[${escapeRegExp(chars)}]+|[${escapeRegExp(chars)}]+$`, 'g');
-  return string.replace(pattern, '');
+  return string.slice(startOffset(string, chars), endOffset(string, chars));
 }
 
 /**
@@ -49,13 +47,11 @@ export function trimStart(string: string, chars?: string): string {
     return '';
   }
 
-  if (!chars) {
+  if (chars == null) {
     return string.trimStart();
   }
 
-  // Create a regex pattern with the chars to trim
-  const pattern = new RegExp(`^[${escapeRegExp(chars)}]+`, 'g');
-  return string.replace(pattern, '');
+  return string.slice(startOffset(string, chars));
 }
 
 /**
@@ -79,18 +75,25 @@ export function trimEnd(string: string, chars?: string): string {
     return '';
   }
 
-  if (!chars) {
+  if (chars == null) {
     return string.trimEnd();
   }
 
-  // Create a regex pattern with the chars to trim
-  const pattern = new RegExp(`[${escapeRegExp(chars)}]+$`, 'g');
-  return string.replace(pattern, '');
+  return string.slice(0, endOffset(string, chars));
 }
 
-/**
- * Escapes the RegExp special characters in a string.
- */
-function escapeRegExp(string: string): string {
-  return string.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
+function startOffset(string: string, chars: string): number {
+  let start = 0;
+  while (start < string.length && chars.includes(string[start])) {
+    start++;
+  }
+  return start;
+}
+
+function endOffset(string: string, chars: string): number {
+  let end = string.length;
+  while (end > 0 && chars.includes(string[end - 1])) {
+    end--;
+  }
+  return end;
 }

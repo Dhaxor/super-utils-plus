@@ -1,7 +1,11 @@
 import { isEqual } from '../utils/is.js';
+import { ValueIteratee } from '../utils/types.js';
+import { toValueIteratee } from '../internal/iteratee.js';
 
 /**
- * Creates an array of unique values that are included in all given arrays.
+ * Creates an array of unique values that are included in all given arrays,
+ * using SameValueZero for equality comparisons. The order of result values is
+ * determined by the first array.
  *
  * @param arrays - The arrays to inspect
  * @returns The new array of intersecting values
@@ -17,24 +21,15 @@ export function intersection<T>(...arrays: T[][]): T[] {
     return [];
   }
 
-  if (arrays.length === 1) {
-    return [...new Set(arrays[0])];
-  }
-
-  const result: T[] = [];
   const [first, ...rest] = arrays;
-
-  // Use a Set for better performance when checking the first array
   const uniqueFirst = [...new Set(first)];
 
-  for (const item of uniqueFirst) {
-    // Check if item is in all other arrays
-    if (rest.every(array => array.includes(item))) {
-      result.push(item);
-    }
+  if (!rest.length) {
+    return uniqueFirst;
   }
 
-  return result;
+  const sets = rest.map(array => new Set(array));
+  return uniqueFirst.filter(item => sets.every(set => set.has(item)));
 }
 
 /**
@@ -55,14 +50,9 @@ export function intersectionDeep<T>(...arrays: T[][]): T[] {
     return [];
   }
 
-  if (arrays.length === 1) {
-    return [...new Set(arrays[0])];
-  }
-
   const [first, ...rest] = arrays;
-  const result: T[] = [];
 
-  // Create a new array with unique values from the first array
+  // Unique values of the first array, by deep equality
   const uniqueFirst: T[] = [];
   for (const item of first) {
     if (!uniqueFirst.some(uniqueItem => isEqual(uniqueItem, item))) {
@@ -70,21 +60,17 @@ export function intersectionDeep<T>(...arrays: T[][]): T[] {
     }
   }
 
-  for (const item of uniqueFirst) {
-    // Check if item is in all other arrays using deep equality
-    if (rest.every(array => array.some(arrayItem => isEqual(arrayItem, item)))) {
-      result.push(item);
-    }
-  }
-
-  return result;
+  return uniqueFirst.filter(item =>
+    rest.every(array => array.some(arrayItem => isEqual(arrayItem, item)))
+  );
 }
 
 /**
  * Creates an array of unique values that are included in all given arrays
- * using a custom iteratee function.
+ * using an iteratee (a function or property name) to derive the comparison
+ * key for each element. Keys are compared with SameValueZero.
  *
- * @param arrays - The arrays to inspect with the last array being a function or property name
+ * @param arrays - The arrays to inspect, with the last argument being the iteratee
  * @returns The new array of intersecting values
  *
  * @example
@@ -96,36 +82,24 @@ export function intersectionDeep<T>(...arrays: T[][]): T[] {
  * // => [{ 'x': 1 }]
  * ```
  */
-export function intersectionBy<T, K = T>(...arrays: [...T[][], ((value: T) => K) | keyof T]): T[] {
+export function intersectionBy<T, K = T>(...arrays: [...T[][], ValueIteratee<T, K>]): T[] {
   if (arrays.length <= 1) {
     return [];
   }
 
-  const iteratee = arrays.pop() as ((value: T) => K) | keyof T;
-  const iterateeFn =
-    typeof iteratee === 'function'
-      ? (iteratee as (value: T) => K)
-      : (obj: T) => obj[iteratee as keyof T] as unknown as K;
+  const iterateeFn = toValueIteratee(arrays[arrays.length - 1] as ValueIteratee<T, K>);
+  const [first, ...rest] = arrays.slice(0, -1) as T[][];
 
-  const [first, ...rest] = arrays as T[][];
+  const keySets = rest.map(array => new Set(array.map(item => iterateeFn(item))));
+  const seen = new Set<K>();
   const result: T[] = [];
 
-  // Create a map of transformed values to the original item for the first array
-  const firstMap = new Map<K, T[]>();
-
   for (const item of first) {
-    const transformed = iterateeFn(item);
-    if (!firstMap.has(transformed)) {
-      firstMap.set(transformed, []);
-    }
-    firstMap.get(transformed)!.push(item);
-  }
+    const key = iterateeFn(item);
 
-  // Check each transformed value against other arrays
-  for (const [key, items] of firstMap.entries()) {
-    if (rest.every(array => array.some(item => isEqual(iterateeFn(item), key)))) {
-      // Add all items with this transformed value
-      result.push(...items);
+    if (!seen.has(key) && keySets.every(set => set.has(key))) {
+      seen.add(key);
+      result.push(item);
     }
   }
 

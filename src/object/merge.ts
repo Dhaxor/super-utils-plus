@@ -1,11 +1,19 @@
-import { isArray, isObject } from '../utils/is.js';
+import { isArray, isObject, isPlainObject } from '../utils/is.js';
 import { DeepPartial } from '../utils/types.js';
+import { isUnsafeKey } from '../internal/path.js';
+import { deepClone } from './deepClone.js';
 
 /**
- * Recursively merges own and inherited enumerable string keyed properties of source
- * objects into the destination object. Source properties that resolve to undefined
- * are skipped if a destination value exists. Array and plain object properties are
- * merged recursively. Other objects and value types are overridden by assignment.
+ * Recursively merges own enumerable string keyed properties of source objects
+ * into the destination object. Source properties that resolve to undefined are
+ * skipped. Array and plain object source values are merged recursively into an
+ * existing array or object; other source values (including Dates, Maps, and class
+ * instances) are assigned as-is. Plain object and array source values that cannot
+ * be merged into an existing value are deep cloned rather than shared by reference.
+ *
+ * The destination object is mutated and returned. Keys named `__proto__`,
+ * `constructor`, or `prototype` are ignored so that untrusted input cannot
+ * modify `Object.prototype`.
  *
  * @param object - The destination object
  * @param sources - The source objects
@@ -26,76 +34,68 @@ import { DeepPartial } from '../utils/types.js';
  * ```
  */
 export function merge<T extends object>(object: T, ...sources: Array<DeepPartial<T>>): T {
-  if (!sources.length) {
+  if (!isObject(object)) {
     return object;
   }
 
-  const source = sources.shift();
-
-  if (isObject(object) && isObject(source)) {
-    for (const key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        const srcValue = source[key];
-        const objValue = (object as Record<string, any>)[key];
-
-        // Skip undefined values
-        if (srcValue === undefined) {
-          continue;
-        }
-
-        // Recursively merge arrays
-        if (isArray(srcValue) && isArray(objValue)) {
-          (object as Record<string, any>)[key] = mergeArrays(objValue, srcValue);
-        }
-        // Recursively merge objects
-        else if (isObject(srcValue) && isObject(objValue)) {
-          (object as Record<string, any>)[key] = merge(
-            objValue,
-            srcValue as DeepPartial<typeof objValue>
-          );
-        }
-        // Otherwise simply assign
-        else {
-          (object as Record<string, any>)[key] = srcValue;
-        }
-      }
+  for (const source of sources) {
+    if (isObject(source)) {
+      mergeInto(object as Record<string, any>, source as Record<string, any>);
     }
   }
 
-  // Continue merging with the next source
-  return sources.length ? merge(object, ...sources) : object;
+  return object;
 }
 
-/**
- * Merges two arrays by index, recursively merging objects at the same position.
- */
-function mergeArrays<T>(arr1: T[], arr2: T[]): T[] {
-  const result = [...arr1];
-
-  for (let i = 0; i < arr2.length; i++) {
-    const item2 = arr2[i];
-
-    // If we're beyond the bounds of arr1, simply append
-    if (i >= arr1.length) {
-      result.push(item2);
+function mergeInto(target: Record<string, any>, source: Record<string, any>): void {
+  for (const key of Object.keys(source)) {
+    if (isUnsafeKey(key)) {
       continue;
     }
 
-    const item1 = result[i];
+    const srcValue = source[key];
 
-    // If both items are objects, recursively merge them
-    if (isObject(item1) && isObject(item2)) {
-      result[i] = merge(item1 as object, item2 as DeepPartial<typeof item1>) as T;
+    // Skip undefined values
+    if (srcValue === undefined) {
+      continue;
     }
-    // If both items are arrays, recursively merge them
-    else if (isArray(item1) && isArray(item2)) {
-      result[i] = mergeArrays(item1, item2) as unknown as T;
+
+    target[key] = mergeValue(target[key], srcValue);
+  }
+}
+
+function mergeValue(objValue: any, srcValue: any): any {
+  if (isArray(srcValue)) {
+    return isArray(objValue) ? mergeArrays(objValue, srcValue) : deepClone(srcValue);
+  }
+
+  if (isPlainObject(srcValue)) {
+    // Merge into any existing object (plain object, class instance, Map, ...)
+    if (isObject(objValue)) {
+      mergeInto(objValue, srcValue);
+      return objValue;
     }
-    // Otherwise use the value from arr2
-    else if (item2 !== undefined) {
-      result[i] = item2;
+    return deepClone(srcValue);
+  }
+
+  // Dates, Maps, class instances, primitives, functions: assign as-is
+  return srcValue;
+}
+
+/**
+ * Merges two arrays by index, recursively merging values at the same position.
+ * The first array is mutated and returned.
+ */
+function mergeArrays(target: any[], source: any[]): any[] {
+  for (let i = 0; i < source.length; i++) {
+    const srcValue = source[i];
+
+    if (i >= target.length) {
+      target.push(mergeValue(undefined, srcValue));
+    } else if (srcValue !== undefined) {
+      target[i] = mergeValue(target[i], srcValue);
     }
   }
 
-  return result;
+  return target;
 }

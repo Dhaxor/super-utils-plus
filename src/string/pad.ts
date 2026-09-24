@@ -7,15 +7,17 @@
  * @returns The padded string
  */
 export function pad(string: string, length = 0, chars = ' '): string {
-  if (string.length >= length) {
-    return string;
+  const value = string ?? '';
+
+  if (value.length >= length) {
+    return value;
   }
 
-  const totalPadding = length - string.length;
+  const totalPadding = length - value.length;
   const leftPadding = Math.floor(totalPadding / 2);
   const rightPadding = totalPadding - leftPadding;
 
-  return createPadding(leftPadding, chars) + string + createPadding(rightPadding, chars);
+  return createPadding(leftPadding, chars) + value + createPadding(rightPadding, chars);
 }
 
 /**
@@ -27,11 +29,13 @@ export function pad(string: string, length = 0, chars = ' '): string {
  * @returns The padded string
  */
 export function padStart(string: string, length = 0, chars = ' '): string {
-  if (string.length >= length) {
-    return string;
+  const value = string ?? '';
+
+  if (value.length >= length) {
+    return value;
   }
 
-  return createPadding(length - string.length, chars) + string;
+  return createPadding(length - value.length, chars) + value;
 }
 
 /**
@@ -43,11 +47,13 @@ export function padStart(string: string, length = 0, chars = ' '): string {
  * @returns The padded string
  */
 export function padEnd(string: string, length = 0, chars = ' '): string {
-  if (string.length >= length) {
-    return string;
+  const value = string ?? '';
+
+  if (value.length >= length) {
+    return value;
   }
 
-  return string + createPadding(length - string.length, chars);
+  return value + createPadding(length - value.length, chars);
 }
 
 function createPadding(length: number, chars: string): string {

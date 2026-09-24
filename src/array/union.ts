@@ -1,7 +1,10 @@
 import { isEqual } from '../utils/is.js';
+import { ValueIteratee } from '../utils/types.js';
+import { toValueIteratee } from '../internal/iteratee.js';
 
 /**
- * Creates an array of unique values, in order, from all given arrays.
+ * Creates an array of unique values, in order, from all given arrays,
+ * using SameValueZero for equality comparisons.
  *
  * @param arrays - The arrays to inspect
  * @returns The new array of combined unique values
@@ -39,10 +42,8 @@ export function unionDeep<T>(...arrays: T[][]): T[] {
   }
 
   const result: T[] = [];
-  const flattened = arrays.flat();
 
-  for (const item of flattened) {
-    // Only add if not already in result using deep equality
+  for (const item of arrays.flat()) {
     if (!result.some(resultItem => isEqual(resultItem, item))) {
       result.push(item);
     }
@@ -53,9 +54,10 @@ export function unionDeep<T>(...arrays: T[][]): T[] {
 
 /**
  * Creates an array of unique values, in order, from all given arrays
- * using a custom iteratee function.
+ * using an iteratee (a function or property name) to derive the comparison
+ * key for each element. Keys are compared with SameValueZero.
  *
- * @param arrays - The arrays to inspect with the last argument being a function or property name
+ * @param arrays - The arrays to inspect, with the last argument being the iteratee
  * @returns The new array of combined unique values
  *
  * @example
@@ -67,27 +69,21 @@ export function unionDeep<T>(...arrays: T[][]): T[] {
  * // => [{ 'x': 1 }, { 'x': 2 }]
  * ```
  */
-export function unionBy<T, K = T>(...arrays: [...T[][], ((value: T) => K) | keyof T]): T[] {
+export function unionBy<T, K = T>(...arrays: [...T[][], ValueIteratee<T, K>]): T[] {
   if (arrays.length <= 1) {
     return [];
   }
 
-  const iteratee = arrays.pop() as ((value: T) => K) | keyof T;
-  const iterateeFn =
-    typeof iteratee === 'function'
-      ? (iteratee as (value: T) => K)
-      : (obj: T) => obj[iteratee as keyof T] as unknown as K;
-
-  const flattened = (arrays as T[][]).flat();
+  const iterateeFn = toValueIteratee(arrays[arrays.length - 1] as ValueIteratee<T, K>);
+  const flattened = (arrays.slice(0, -1) as T[][]).flat();
   const result: T[] = [];
   const seen = new Set<K>();
 
   for (const item of flattened) {
-    const transformed = iterateeFn(item);
+    const key = iterateeFn(item);
 
-    // Check if we've seen this transformed value before
-    if (!seen.has(transformed)) {
-      seen.add(transformed);
+    if (!seen.has(key)) {
+      seen.add(key);
       result.push(item);
     }
   }

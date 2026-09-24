@@ -1,5 +1,6 @@
-import { isArray, isObject } from '../utils/is.js';
+import { isArray } from '../utils/is.js';
 import { flatten, flattenDeep } from './flatten.js';
+import { toPropertyIteratee } from '../internal/iteratee.js';
 
 /**
  * Creates an array of values by running each element in collection through iteratee.
@@ -38,19 +39,7 @@ export function map<T, R>(
     return [];
   }
 
-  // Convert iteratee to a function if it's a string
-  let iterateeFn: (value: T, index: number, collection: T[]) => R;
-
-  if (typeof iteratee === 'string') {
-    const key = iteratee;
-    iterateeFn = (value: T) => {
-      return isObject(value) ? ((value as any)[key] as R) : (undefined as any);
-    };
-  } else {
-    iterateeFn = iteratee;
-  }
-
-  return collection.map(iterateeFn);
+  return collection.map(toPropertyIteratee(iteratee));
 }
 
 /**

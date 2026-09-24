@@ -134,11 +134,10 @@ export function throttle<T extends (...args: any[]) => any>(
       if (timerId === undefined) {
         return leadingEdge(time);
       }
-      if (trailing) {
-        // Handle invocations in a tight loop.
-        timerId = startTimer(timerExpired, wait);
-        return invokeFunc(time);
-      }
+      // The window has elapsed but the timer has not fired yet (for example a busy
+      // event loop): invoke now and start a fresh window.
+      timerId = startTimer(timerExpired, wait);
+      return invokeFunc(time);
     }
     if (timerId === undefined) {
       timerId = startTimer(timerExpired, wait);

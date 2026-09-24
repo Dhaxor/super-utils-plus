@@ -47,9 +47,7 @@ export function template(
 
   string.replace(matcher, (match, escape, interpolate, evaluate, offset) => {
     // Add the text between the last match and this one
-    source += string.slice(index, offset).replace(/[\\'\n\r]/g, char => {
-      return char === "'" ? "\\'" : char === '\n' ? '\\n' : char === '\r' ? '\\r' : char;
-    });
+    source += string.slice(index, offset).replace(/[\\'\n\r\u2028\u2029]/g, escapeStringChar);
 
     index = offset + match.length;
 
@@ -76,22 +74,8 @@ export function template(
   const renderFunction = new Function(
     '_',
     'data',
-    [
-      "var __t, __p = '', __j = Array.prototype.join, __e = _.escape;",
-      'with (data || {}) {',
-      source,
-      '};',
-      'return __p;',
-    ].join('\n')
+    ["var __t, __p = '';", 'with (data || {}) {', source, '};', 'return __p;'].join('\n')
   );
-
-  const escapeHTML = (str: string) =>
-    String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
 
   // Create the final template function
   const compiledTemplate = (data?: Record<string, any>) => {
@@ -105,4 +89,26 @@ export function template(
   };
 
   return compiledTemplate;
+}
+
+const STRING_ESCAPES: Record<string, string> = {
+  '\\': '\\\\',
+  "'": "\\'",
+  '\n': '\\n',
+  '\r': '\\r',
+  '\u2028': '\\u2028',
+  '\u2029': '\\u2029',
+};
+
+function escapeStringChar(char: string): string {
+  return STRING_ESCAPES[char];
+}
+
+function escapeHTML(value: unknown): string {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

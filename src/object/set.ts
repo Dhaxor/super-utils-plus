@@ -1,10 +1,14 @@
-import { isArray, isNil, isString } from '../utils/is.js';
+import { isNil } from '../utils/is.js';
 import { PropertyPath } from '../utils/types.js';
+import { hasUnsafeKey, isIndexSegment, toPath } from '../internal/path.js';
 
 /**
  * Sets the value at path of object. If a portion of path doesn't exist, it's created.
  * Arrays are created for missing index properties while objects are created for all
  * other missing properties.
+ *
+ * Paths containing `__proto__`, `constructor`, or `prototype` are ignored so that
+ * untrusted paths cannot modify `Object.prototype`.
  *
  * @param object - The object to modify
  * @param path - The path of the property to set
@@ -27,100 +31,29 @@ export function set<T extends object, V>(object: T, path: PropertyPath, value: V
     return object;
   }
 
-  const segments: (string | number | symbol)[] = isString(path)
-    ? parsePath(path as string)
-    : isArray(path)
-      ? (path as (string | number | symbol)[])
-      : [path as string | number | symbol];
+  const segments = toPath(path);
 
-  if (!segments.length) {
+  if (!segments.length || hasUnsafeKey(segments)) {
     return object;
   }
 
-  const root = object;
   const lastIndex = segments.length - 1;
-
-  // Create nested properties if they don't exist
-  let current: any = root;
+  let current: any = object;
 
   for (let i = 0; i < lastIndex; i++) {
     const segment = segments[i];
-    const nextSegment = segments[i + 1];
-    const isNextIndexProperty =
-      typeof nextSegment === 'number' || /^\d+$/.test(String(nextSegment));
+    let child = current[segment];
 
-    // If the current segment doesn't exist, create it
-    if ((current as Record<string | number | symbol, any>)[segment] === undefined) {
-      // Create an array if the next segment is an index, otherwise an object
-      (current as Record<string | number | symbol, any>)[segment] = isNextIndexProperty ? [] : {};
+    // Create (or replace a primitive with) the container the next segment needs
+    if (child === null || typeof child !== 'object') {
+      child = isIndexSegment(segments[i + 1]) ? [] : {};
+      current[segment] = child;
     }
 
-    current = (current as Record<string | number | symbol, any>)[segment];
-
-    // If we unexpectedly hit a primitive value, replace it with an object or array
-    if (current === null || typeof current !== 'object') {
-      current = (root as Record<string | number | symbol, any>)[segment] = isNextIndexProperty
-        ? []
-        : {};
-    }
+    current = child;
   }
 
-  // Set the final value
   current[segments[lastIndex]] = value;
 
-  return root;
-}
-
-/**
- * Parses a string path into path segments.
- * Supports dot notation and bracket notation.
- *
- * @param path - The path to parse
- * @returns An array of path segments
- *
- * @example
- * ```ts
- * parsePath('a[0].b.c');
- * // => ['a', 0, 'b', 'c']
- * ```
- */
-function parsePath(path: string): (string | number)[] {
-  // Split by dots, but not within brackets
-  const segments: (string | number)[] = [];
-  let currentSegment = '';
-  let inBrackets = false;
-
-  for (let i = 0; i < path.length; i++) {
-    const char = path[i];
-
-    if (char === '[') {
-      if (currentSegment) {
-        segments.push(currentSegment);
-        currentSegment = '';
-      }
-      inBrackets = true;
-    } else if (char === ']') {
-      // If it's a number in brackets, convert to number
-      if (/^\d+$/.test(currentSegment)) {
-        segments.push(parseInt(currentSegment, 10));
-      } else {
-        segments.push(currentSegment);
-      }
-      currentSegment = '';
-      inBrackets = false;
-    } else if (char === '.' && !inBrackets) {
-      if (currentSegment) {
-        segments.push(currentSegment);
-        currentSegment = '';
-      }
-    } else {
-      currentSegment += char;
-    }
-  }
-
-  if (currentSegment) {
-    segments.push(currentSegment);
-  }
-
-  return segments;
+  return object;
 }

@@ -1,4 +1,5 @@
-import { isObject, isArray } from '../utils/is.js';
+import { PredicateShorthand } from '../utils/types.js';
+import { toPredicate } from '../internal/iteratee.js';
 
 /**
  * Iterates over elements of collection, returning an array of all elements
@@ -31,58 +32,12 @@ import { isObject, isArray } from '../utils/is.js';
  * // => objects for ['barney']
  * ```
  */
-export function filter<T>(
-  collection: T[],
-  predicate:
-    | ((value: T, index: number, collection: T[]) => boolean)
-    | Record<string, any>
-    | string
-    | [string, any]
-): T[] {
+export function filter<T>(collection: T[], predicate: PredicateShorthand<T>): T[] {
   if (!collection || !collection.length) {
     return [];
   }
 
-  // Convert predicate to a function if it's not already one
-  let predicateFn: (value: T, index: number, collection: T[]) => boolean;
-
-  if (typeof predicate === 'function') {
-    // Function predicate
-    predicateFn = predicate as (value: T, index: number, collection: T[]) => boolean;
-  } else if (isArray(predicate) && predicate.length === 2) {
-    // Property and value pair
-    const [prop, value] = predicate as [string, any];
-    predicateFn = (item: T) => {
-      return isObject(item) && (item as any)[prop] === value;
-    };
-  } else if (isObject(predicate)) {
-    // Object matching
-    predicateFn = (item: T) => {
-      if (!isObject(item)) return false;
-
-      const objItem = item as Record<string, any>;
-      const objPred = predicate as Record<string, any>;
-
-      for (const key in objPred) {
-        if (objItem[key] !== objPred[key]) {
-          return false;
-        }
-      }
-
-      return true;
-    };
-  } else if (typeof predicate === 'string') {
-    // Property name
-    const prop = predicate;
-    predicateFn = (item: T) => {
-      return isObject(item) && Boolean((item as any)[prop]);
-    };
-  } else {
-    // Default to identity function
-    predicateFn = Boolean as any;
-  }
-
-  return collection.filter(predicateFn);
+  return collection.filter(toPredicate(predicate));
 }
 
 /**
@@ -104,19 +59,11 @@ export function filter<T>(
  * // => objects for ['fred']
  * ```
  */
-export function reject<T>(
-  collection: T[],
-  predicate:
-    | ((value: T, index: number, collection: T[]) => boolean)
-    | Record<string, any>
-    | string
-    | [string, any]
-): T[] {
-  // Reuse filter but negate the predicate
-  const filterPredicate =
-    typeof predicate === 'function'
-      ? (value: T, index: number, collection: T[]) => !predicate(value, index, collection)
-      : (value: T) => !filter([value], predicate).length;
+export function reject<T>(collection: T[], predicate: PredicateShorthand<T>): T[] {
+  if (!collection || !collection.length) {
+    return [];
+  }
 
-  return filter(collection, filterPredicate);
+  const predicateFn = toPredicate(predicate);
+  return collection.filter((value, index, array) => !predicateFn(value, index, array));
 }

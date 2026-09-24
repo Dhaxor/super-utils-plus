@@ -1,4 +1,9 @@
 /**
+ * Marks an argument position to be filled later. Shared by `partial` and `partialRight`.
+ */
+const PLACEHOLDER: unique symbol = Symbol('partial.placeholder');
+
+/**
  * Creates a function that invokes `func` with `partials` prepended to the arguments
  * it receives. This method is like `bind` except it does not alter the `this` binding.
  *
@@ -25,14 +30,11 @@ export function partial<T extends (...args: any[]) => any>(
     // Create a copy of partials to avoid modifying the original array
     const argsWithPartials = [...partials];
 
-    // Replace placeholder values with arguments
+    // Replace placeholder values with arguments; unfilled placeholders become undefined
     let argIndex = 0;
     for (let i = 0; i < argsWithPartials.length; i++) {
-      // If we encounter a placeholder, replace it with an argument
-      if (argsWithPartials[i] === partial.placeholder) {
-        if (argIndex < args.length) {
-          argsWithPartials[i] = args[argIndex++];
-        }
+      if (argsWithPartials[i] === PLACEHOLDER) {
+        argsWithPartials[i] = argIndex < args.length ? args[argIndex++] : undefined;
       }
     }
 
@@ -45,8 +47,8 @@ export function partial<T extends (...args: any[]) => any>(
   };
 }
 
-// Define a placeholder value
-partial.placeholder = Symbol('partial.placeholder');
+// `partial.placeholder` and `partialRight.placeholder` are the same symbol
+partial.placeholder = PLACEHOLDER;
 
 /**
  * This method is like `partial` except that partially applied arguments
@@ -75,14 +77,12 @@ export function partialRight<T extends (...args: any[]) => any>(
     // Create a copy of partials to avoid modifying the original array
     const argsWithPartials = [...partials];
 
-    // Replace placeholder values with arguments, from right to left
+    // Replace placeholder values with arguments, from right to left; unfilled
+    // placeholders become undefined
     let argIndex = args.length - 1;
     for (let i = argsWithPartials.length - 1; i >= 0; i--) {
-      // If we encounter a placeholder, replace it with an argument
-      if (argsWithPartials[i] === partialRight.placeholder) {
-        if (argIndex >= 0) {
-          argsWithPartials[i] = args[argIndex--];
-        }
+      if (argsWithPartials[i] === PLACEHOLDER) {
+        argsWithPartials[i] = argIndex >= 0 ? args[argIndex--] : undefined;
       }
     }
 
@@ -96,5 +96,4 @@ export function partialRight<T extends (...args: any[]) => any>(
   };
 }
 
-// Define a placeholder value
-partialRight.placeholder = Symbol('partialRight.placeholder');
+partialRight.placeholder = PLACEHOLDER;

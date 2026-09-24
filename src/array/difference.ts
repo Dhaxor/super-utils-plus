@@ -1,7 +1,10 @@
 import { isEqual } from '../utils/is.js';
+import { ValueIteratee } from '../utils/types.js';
+import { toValueIteratee } from '../internal/iteratee.js';
 
 /**
- * Creates an array of array values not included in the other given arrays.
+ * Creates an array of array values not included in the other given arrays,
+ * using SameValueZero for equality comparisons.
  *
  * @param array - The array to inspect
  * @param values - The arrays of values to exclude
@@ -48,10 +51,11 @@ export function differenceDeep<T>(array: T[], ...values: T[][]): T[] {
 
 /**
  * Creates an array of array values not included in the other given arrays
- * using a custom predicate function.
+ * using an iteratee (a function or property name) to derive the comparison
+ * key for each element. Keys are compared with SameValueZero.
  *
  * @param array - The array to inspect
- * @param predicate - The function invoked per element to determine if it should be excluded
+ * @param iteratee - The function or property name used to derive comparison keys
  * @param values - The arrays of values to exclude
  * @returns The new array of filtered values
  *
@@ -66,23 +70,15 @@ export function differenceDeep<T>(array: T[], ...values: T[][]): T[] {
  */
 export function differenceBy<T, K = T>(
   array: T[],
-  iteratee: ((value: T) => K) | keyof T,
+  iteratee: ValueIteratee<T, K>,
   ...values: T[][]
 ): T[] {
   if (!array || !array.length) {
     return [];
   }
 
-  const excludeValues = values.flat();
-  const iterateeFn =
-    typeof iteratee === 'function'
-      ? iteratee
-      : (obj: T) => obj[iteratee as keyof T] as unknown as K;
+  const iterateeFn = toValueIteratee(iteratee);
+  const excludeKeys = new Set(values.flat().map(item => iterateeFn(item)));
 
-  const excludeValuesTransformed = excludeValues.map(iterateeFn);
-
-  return array.filter(item => {
-    const transformed = iterateeFn(item);
-    return !excludeValuesTransformed.some(excludeItem => isEqual(transformed, excludeItem));
-  });
+  return array.filter(item => !excludeKeys.has(iterateeFn(item)));
 }

@@ -1,3 +1,5 @@
+import { compoundWords } from '../internal/words.js';
+
 /**
  * Converts string to snake case.
  *
@@ -21,13 +23,7 @@ export function snakeCase(string: string): string {
     return '';
   }
 
-  // Convert camelCase to snake_case
-  const camelToSnake = string.replace(/([a-z0-9])([A-Z])/g, '$1_$2');
-
-  // Convert to lowercase and remove special characters
-  return camelToSnake
-    .toLowerCase()
-    .replace(/[\\s\\-]+/g, '_')
-    .replace(/[^a-z0-9_]/g, '')
-    .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+  return compoundWords(string)
+    .map(word => word.toLowerCase())
+    .join('_');
 }

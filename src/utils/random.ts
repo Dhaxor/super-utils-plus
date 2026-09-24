@@ -1,14 +1,14 @@
 /**
- * Generates a random number between min and max (inclusive).
+ * Generates a random floating-point number between min (inclusive) and max (exclusive).
  *
- * @param min - The minimum value
- * @param max - The maximum value
- * @returns A random number between min and max
+ * @param min - The lower bound (inclusive)
+ * @param max - The upper bound (exclusive)
+ * @returns A random number in the range [min, max)
  *
  * @example
  * ```ts
  * random(1, 10);
- * // => a number between 1 and 10
+ * // => 4.237...
  * ```
  */
 export function random(min = 0, max = 1): number {
