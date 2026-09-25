@@ -63,6 +63,27 @@ ES module build; Jest maps the extension back to the TypeScript source).
 - Document the function with a JSDoc block and at least one `@example`.
 - Add it to the API index in `README.md`.
 
+## Releasing
+
+Releases are published to npm by the `Release` GitHub Actions workflow when a
+version tag is pushed.
+
+1. Update `version` in `package.json` and `package-lock.json`
+   (`npm version <x.y.z> --no-git-tag-version`).
+2. Move the `Unreleased` entries in `CHANGELOG.md` under a new version heading.
+3. Merge those changes to `master` through a pull request with green CI.
+4. Tag the merge commit and push the tag:
+
+   ```bash
+   git tag -a v2.0.0 -m "v2.0.0"
+   git push origin v2.0.0
+   ```
+
+The workflow checks that the tag matches `package.json`, runs the full check,
+builds, verifies the packed tarball, and publishes with npm provenance. It
+authenticates with npm trusted publishing when that is configured for this
+repository on npmjs.com, or with an `NPM_TOKEN` repository secret otherwise.
+
 ## Reporting bugs
 
 Open an issue with a minimal reproduction, the expected result, and the actual

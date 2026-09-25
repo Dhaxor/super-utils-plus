@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-25
+
+This release fixes security and correctness bugs across the library. Most code
+keeps working unchanged, but the behaviours below changed on purpose.
+
+### Breaking changes
+
+- `defaults` and `defaultsDeep` return a new object instead of mutating the first
+  argument. Use the return value: `config = defaults(config, fallback)`.
+- `defaultsDeep` only fills `undefined` properties; `null` values are kept, matching
+  `defaults` and Lodash.
+- `get` returns a stored `null` instead of the default value. The default applies only
+  when the resolved value is `undefined`, as the documentation always stated.
+- The string path `''` now addresses the empty-string key (`get({ '': 1 }, '')` is `1`).
+  Leading, trailing, or doubled dots produce empty-string segments, as in Lodash. Use `[]`
+  for "no path".
+- `merge` assigns `Date`, `Map`, `Set`, and class-instance source values instead of
+  recursing into them.
+- `camelCase`, `kebabCase`, and `snakeCase` drop apostrophes and accents
+  (`"Don't Crème"` becomes `'dont-creme'`), matching Lodash. Previously they returned
+  mangled output, so any code that relied on the old results was already broken.
+- `curryRight`, `partial`, and `partialRight` now apply arguments in the documented
+  order; `partial.placeholder` and `partialRight.placeholder` are the same symbol.
+- The build output moved from `dist/` to `dist/cjs` (CommonJS) and `dist/esm`
+  (ES modules). Imports through the `exports` map (`super-utils-plus` and its subpaths)
+  are unaffected; only tools that bypass it and reference files under `dist/` directly
+  need updating.
+
 ### Security
 
 - `set`, `merge`, `defaults`, `defaultsDeep`, and `zipObjectDeep` now ignore the keys
@@ -77,6 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   type declarations. Subpath imports (`super-utils-plus/array`, …) work in both formats.
 - `PredicateShorthand`, `ValueIteratee`, `TruncateOptions`, and `MemoizeCache` types.
 - Continuous integration on Node 18, 20, and 22, with a packed-tarball smoke test.
+- A release workflow publishes to npm with provenance when a `v*` tag is pushed.
 
 ### Changed
 
@@ -90,3 +119,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0]
 
 Initial tracked release.
+
+[Unreleased]: https://github.com/Dhaxor/super-utils-plus/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Dhaxor/super-utils-plus/compare/b8e1012...v2.0.0
+[1.1.0]: https://github.com/Dhaxor/super-utils-plus/tree/b8e1012
