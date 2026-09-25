@@ -1,14 +1,15 @@
-import { isObject, isArray } from '../utils/is';
+import { PredicateShorthand } from '../utils/types.js';
+import { toPredicate } from '../internal/iteratee.js';
 
 /**
  * Iterates over elements of collection, returning the first element
  * predicate returns truthy for.
- * 
+ *
  * @param collection - The collection to inspect
  * @param predicate - The function invoked per iteration
  * @param fromIndex - The index to search from
  * @returns The matched element, else undefined
- * 
+ *
  * @example
  * ```ts
  * const users = [
@@ -16,18 +17,18 @@ import { isObject, isArray } from '../utils/is';
  *   { 'user': 'fred',    'age': 40, 'active': false },
  *   { 'user': 'pebbles', 'age': 1,  'active': true }
  * ];
- * 
+ *
  * find(users, function(o) { return o.age < 40; });
  * // => object for 'barney'
- * 
+ *
  * // The `_.matches` iteratee shorthand.
  * find(users, { 'age': 1, 'active': true });
  * // => object for 'pebbles'
- * 
+ *
  * // The `_.matchesProperty` iteratee shorthand.
  * find(users, ['active', false]);
  * // => object for 'fred'
- * 
+ *
  * // The `_.property` iteratee shorthand.
  * find(users, 'active');
  * // => object for 'barney'
@@ -35,76 +36,22 @@ import { isObject, isArray } from '../utils/is';
  */
 export function find<T>(
   collection: T[],
-  predicate: ((value: T, index: number, collection: T[]) => boolean) | 
-              Record<string, any> | 
-              string | 
-              [string, any],
+  predicate: PredicateShorthand<T>,
   fromIndex = 0
 ): T | undefined {
-  if (!collection || !collection.length) {
-    return undefined;
-  }
-  
-  // Convert predicate to a function if it's not already one
-  let predicateFn: (value: T, index: number, collection: T[]) => boolean;
-  
-  if (typeof predicate === 'function') {
-    // Function predicate
-    predicateFn = predicate as (value: T, index: number, array: T[]) => boolean;
-  } else if (isArray(predicate) && predicate.length === 2) {
-    // Property and value pair
-    const [prop, value] = predicate as [string, any];
-    predicateFn = (item: T) => {
-      return isObject(item) && (item as any)[prop] === value;
-    };
-  } else if (isObject(predicate)) {
-    // Object matching
-    predicateFn = (item: T) => {
-      if (!isObject(item)) return false;
-      
-      const objItem = item as Record<string, any>;
-      const objPred = predicate as Record<string, any>;
-      
-      for (const key in objPred) {
-        if (objItem[key] !== objPred[key]) {
-          return false;
-        }
-      }
-      
-      return true;
-    };
-  } else if (typeof predicate === 'string') {
-    // Property name
-    const prop = predicate;
-    predicateFn = (item: T) => {
-      return isObject(item) && Boolean((item as any)[prop]);
-    };
-  } else {
-    // Default to identity function
-    predicateFn = Boolean as any;
-  }
-  
-  const startIndex = Math.max(0, fromIndex);
-  const endIndex = collection.length;
-  
-  for (let i = startIndex; i < endIndex; i++) {
-    if (predicateFn(collection[i], i, collection)) {
-      return collection[i];
-    }
-  }
-  
-  return undefined;
+  const index = findIndex(collection, predicate, fromIndex);
+  return index === -1 ? undefined : collection[index];
 }
 
 /**
  * This method is like find except that it iterates over elements of
  * collection from right to left.
- * 
+ *
  * @param collection - The collection to inspect
  * @param predicate - The function invoked per iteration
  * @param fromIndex - The index to search from
  * @returns The matched element, else undefined
- * 
+ *
  * @example
  * ```ts
  * findLast([1, 2, 3, 4], function(n) {
@@ -115,75 +62,22 @@ export function find<T>(
  */
 export function findLast<T>(
   collection: T[],
-  predicate: ((value: T, index: number, collection: T[]) => boolean) | 
-              Record<string, any> | 
-              string | 
-              [string, any],
+  predicate: PredicateShorthand<T>,
   fromIndex?: number
 ): T | undefined {
-  if (!collection || !collection.length) {
-    return undefined;
-  }
-  
-  // Convert predicate to a function if it's not already one
-  let predicateFn: (value: T, index: number, collection: T[]) => boolean;
-  
-  if (typeof predicate === 'function') {
-    // Function predicate
-    predicateFn = predicate as (value: T, index: number, collection: T[]) => boolean;
-  } else if (isArray(predicate) && predicate.length === 2) {
-    // Property and value pair
-    const [prop, value] = predicate as [string, any];
-    predicateFn = (item: T) => {
-      return isObject(item) && (item as any)[prop] === value;
-    };
-  } else if (isObject(predicate)) {
-    // Object matching
-    predicateFn = (item: T) => {
-      if (!isObject(item)) return false;
-      
-      const objItem = item as Record<string, any>;
-      const objPred = predicate as Record<string, any>;
-      
-      for (const key in objPred) {
-        if (objItem[key] !== objPred[key]) {
-          return false;
-        }
-      }
-      
-      return true;
-    };
-  } else if (typeof predicate === 'string') {
-    // Property name
-    const prop = predicate;
-    predicateFn = (item: T) => {
-      return isObject(item) && Boolean((item as any)[prop]);
-    };
-  } else {
-    // Default to identity function
-    predicateFn = Boolean as any;
-  }
-  
-  const startIndex = fromIndex !== undefined ? Math.min(fromIndex, collection.length - 1) : collection.length - 1;
-  
-  for (let i = startIndex; i >= 0; i--) {
-    if (predicateFn(collection[i], i, collection)) {
-      return collection[i];
-    }
-  }
-  
-  return undefined;
+  const index = findLastIndex(collection, predicate, fromIndex);
+  return index === -1 ? undefined : collection[index];
 }
 
 /**
  * This method is like find except that it returns the index of the first
  * element predicate returns truthy for, instead of the element itself.
- * 
+ *
  * @param array - The array to inspect
  * @param predicate - The function invoked per iteration
  * @param fromIndex - The index to search from
  * @returns The index of the found element, else -1
- * 
+ *
  * @example
  * ```ts
  * const users = [
@@ -191,83 +85,37 @@ export function findLast<T>(
  *   { 'user': 'fred',    'active': false },
  *   { 'user': 'pebbles', 'active': true }
  * ];
- * 
+ *
  * findIndex(users, function(o) { return o.user === 'barney'; });
  * // => 0
  * ```
  */
-export function findIndex<T>(
-  array: T[],
-  predicate: ((value: T, index: number, array: T[]) => boolean) | 
-             Record<string, any> | 
-             string | 
-             [string, any],
-  fromIndex = 0
-): number {
+export function findIndex<T>(array: T[], predicate: PredicateShorthand<T>, fromIndex = 0): number {
   if (!array || !array.length) {
     return -1;
   }
-  
-  // Convert predicate to a function if it's not already one
-  let predicateFn: (value: T, index: number, array: T[]) => boolean;
-  
-  if (typeof predicate === 'function') {
-    // Function predicate
-    predicateFn = predicate as (value: T, index: number, array: T[]) => boolean;
-  } else if (isArray(predicate) && predicate.length === 2) {
-    // Property and value pair
-    const [prop, value] = predicate as [string, any];
-    predicateFn = (item: T) => {
-      return isObject(item) && (item as any)[prop] === value;
-    };
-  } else if (isObject(predicate)) {
-    // Object matching
-    predicateFn = (item: T) => {
-      if (!isObject(item)) return false;
-      
-      const objItem = item as Record<string, any>;
-      const objPred = predicate as Record<string, any>;
-      
-      for (const key in objPred) {
-        if (objItem[key] !== objPred[key]) {
-          return false;
-        }
-      }
-      
-      return true;
-    };
-  } else if (typeof predicate === 'string') {
-    // Property name
-    const prop = predicate;
-    predicateFn = (item: T) => {
-      return isObject(item) && Boolean((item as any)[prop]);
-    };
-  } else {
-    // Default to identity function
-    predicateFn = Boolean as any;
-  }
-  
+
+  const predicateFn = toPredicate(predicate);
   const startIndex = Math.max(0, fromIndex);
-  const endIndex = array.length;
-  
-  for (let i = startIndex; i < endIndex; i++) {
+
+  for (let i = startIndex; i < array.length; i++) {
     if (predicateFn(array[i], i, array)) {
       return i;
     }
   }
-  
+
   return -1;
 }
 
 /**
  * This method is like findIndex except that it iterates over elements
  * of collection from right to left.
- * 
+ *
  * @param array - The array to inspect
  * @param predicate - The function invoked per iteration
  * @param fromIndex - The index to search from
  * @returns The index of the found element, else -1
- * 
+ *
  * @example
  * ```ts
  * const users = [
@@ -275,69 +123,29 @@ export function findIndex<T>(
  *   { 'user': 'fred',    'active': false },
  *   { 'user': 'pebbles', 'active': false }
  * ];
- * 
+ *
  * findLastIndex(users, function(o) { return o.user === 'pebbles'; });
  * // => 2
  * ```
  */
 export function findLastIndex<T>(
   array: T[],
-  predicate: ((value: T, index: number, array: T[]) => boolean) | 
-             Record<string, any> | 
-             string | 
-             [string, any],
+  predicate: PredicateShorthand<T>,
   fromIndex?: number
 ): number {
   if (!array || !array.length) {
     return -1;
   }
-  
-  // Convert predicate to a function if it's not already one
-  let predicateFn: (value: T, index: number, array: T[]) => boolean;
-  
-  if (typeof predicate === 'function') {
-    // Function predicate
-    predicateFn = predicate as (value: T, index: number, array: T[]) => boolean;
-  } else if (isArray(predicate) && predicate.length === 2) {
-    // Property and value pair
-    const [prop, value] = predicate as [string, any];
-    predicateFn = (item: T) => {
-      return isObject(item) && (item as any)[prop] === value;
-    };
-  } else if (isObject(predicate)) {
-    // Object matching
-    predicateFn = (item: T) => {
-      if (!isObject(item)) return false;
-      
-      const objItem = item as Record<string, any>;
-      const objPred = predicate as Record<string, any>;
-      
-      for (const key in objPred) {
-        if (objItem[key] !== objPred[key]) {
-          return false;
-        }
-      }
-      
-      return true;
-    };
-  } else if (typeof predicate === 'string') {
-    // Property name
-    const prop = predicate;
-    predicateFn = (item: T) => {
-      return isObject(item) && Boolean((item as any)[prop]);
-    };
-  } else {
-    // Default to identity function
-    predicateFn = Boolean as any;
-  }
-  
-  const startIndex = fromIndex !== undefined ? Math.min(fromIndex, array.length - 1) : array.length - 1;
-  
+
+  const predicateFn = toPredicate(predicate);
+  const startIndex =
+    fromIndex !== undefined ? Math.min(fromIndex, array.length - 1) : array.length - 1;
+
   for (let i = startIndex; i >= 0; i--) {
     if (predicateFn(array[i], i, array)) {
       return i;
     }
   }
-  
+
   return -1;
 }

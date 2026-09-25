@@ -1,10 +1,10 @@
-import { zip, unzip, zipObject, zipObjectDeep, zipWith, unzipWith } from '../zip';
+import { zip, unzip, zipObject, zipObjectDeep, zipWith, unzipWith } from '../zip.js';
 
 describe('zip', () => {
   test('should zip arrays together', () => {
     expect(zip(['a', 'b'] as any[], [1, 2] as any[], [true, false] as any[])).toEqual([
       ['a', 1, true],
-      ['b', 2, false]
+      ['b', 2, false],
     ]);
   });
 
@@ -12,13 +12,16 @@ describe('zip', () => {
     expect(zip(['a', 'b', 'c'] as any[], [1, 2] as any[])).toEqual([
       ['a', 1],
       ['b', 2],
-      ['c', undefined]
+      ['c', undefined],
     ]);
   });
 
   test('should handle empty arrays', () => {
     expect(zip([])).toEqual([]);
-    expect(zip(['a', 'b'], [])).toEqual([['a', undefined], ['b', undefined]]);
+    expect(zip(['a', 'b'], [])).toEqual([
+      ['a', undefined],
+      ['b', undefined],
+    ]);
   });
 });
 
@@ -26,9 +29,13 @@ describe('unzip', () => {
   test('should unzip an array of grouped elements', () => {
     const zipped = [
       ['a', 1, true],
-      ['b', 2, false]
+      ['b', 2, false],
     ];
-    expect(unzip(zipped)).toEqual([['a', 'b'], [1, 2], [true, false]]);
+    expect(unzip(zipped)).toEqual([
+      ['a', 'b'],
+      [1, 2],
+      [true, false],
+    ]);
   });
 
   test('should handle empty arrays', () => {
@@ -54,13 +61,13 @@ describe('zipObject', () => {
 describe('zipObjectDeep', () => {
   test('should create an object with nested properties', () => {
     expect(zipObjectDeep(['a.b[0].c', 'a.b[1].d'], [1, 2])).toEqual({
-      a: { b: [{ c: 1 }, { d: 2 }] }
+      a: { b: [{ c: 1 }, { d: 2 }] },
     });
   });
 
   test('should handle complex paths', () => {
     expect(zipObjectDeep(['a.b.c', 'a.d[0].e'], [1, 2])).toEqual({
-      a: { b: { c: 1 }, d: [{ e: 2 }] }
+      a: { b: { c: 1 }, d: [{ e: 2 }] },
     });
   });
 
@@ -88,12 +95,16 @@ describe('unzipWith', () => {
   test('should unzip an array applying the specified function', () => {
     const zipped = [
       [1, 10, 100],
-      [2, 20, 200]
+      [2, 20, 200],
     ];
-    expect(unzipWith(zipped, (...values) => values.reduce((sum, n) => sum + n, 0))).toEqual([3, 30, 300]);
+    expect(unzipWith(zipped, (...values) => values.reduce((sum, n) => sum + n, 0))).toEqual([
+      3, 30, 300,
+    ]);
   });
 
   test('should handle empty arrays', () => {
-    expect(unzipWith([], (...values: number[]) => values.reduce((sum: number, n: number) => sum + n, 0))).toEqual([]);
+    expect(
+      unzipWith([], (...values: number[]) => values.reduce((sum: number, n: number) => sum + n, 0))
+    ).toEqual([]);
   });
 });

@@ -1,4 +1,4 @@
-import { sample, sampleSize, shuffle } from '../../index';
+import { sample, sampleSize, shuffle } from '../../index.js';
 
 describe('shuffle', () => {
   afterEach(() => {
@@ -6,9 +6,7 @@ describe('shuffle', () => {
   });
 
   test('should return a shuffled copy of the array', () => {
-    jest.spyOn(Math, 'random')
-      .mockReturnValueOnce(0.1)
-      .mockReturnValueOnce(0.9);
+    jest.spyOn(Math, 'random').mockReturnValueOnce(0.1).mockReturnValueOnce(0.9);
 
     const array = [1, 2, 3];
     const shuffled = shuffle(array);
@@ -45,7 +43,8 @@ describe('sampleSize', () => {
   });
 
   test('should return the requested number of unique random elements', () => {
-    jest.spyOn(Math, 'random')
+    jest
+      .spyOn(Math, 'random')
       .mockReturnValueOnce(0.75)
       .mockReturnValueOnce(0.25)
       .mockReturnValueOnce(0.5);

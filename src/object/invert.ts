@@ -1,4 +1,5 @@
-import { isObject } from '../utils/is';
+import { isObject } from '../utils/is.js';
+import { assignOwnKey } from '../internal/path.js';
 
 /**
  * Creates an object composed of the inverted keys and values of object.
@@ -15,7 +16,7 @@ export function invert<T extends object>(object: T): Record<string, string> {
 
   for (const key in object) {
     if (Object.prototype.hasOwnProperty.call(object, key)) {
-      result[String((object as any)[key])] = key;
+      assignOwnKey(result, String((object as any)[key]), key);
     }
   }
 
@@ -44,8 +45,8 @@ export function invertBy<T extends object>(
     if (Object.prototype.hasOwnProperty.call(object, key)) {
       const invertedKey = iteratee((object as any)[key]);
 
-      if (!result[invertedKey]) {
-        result[invertedKey] = [];
+      if (!Object.prototype.hasOwnProperty.call(result, invertedKey)) {
+        assignOwnKey(result, invertedKey, []);
       }
 
       result[invertedKey].push(key);

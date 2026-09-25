@@ -1,4 +1,4 @@
-import { pad, padEnd, padStart } from '../../index';
+import { pad, padEnd, padStart } from '../../index.js';
 
 describe('pad', () => {
   test('should pad both sides with spaces by default', () => {
@@ -12,6 +12,13 @@ describe('pad', () => {
   test('should return the original string when no padding is needed', () => {
     expect(pad('abcdef', 3)).toBe('abcdef');
   });
+
+  test('should treat nil input as an empty string', () => {
+    expect(pad(undefined as any, 3)).toBe('   ');
+    expect(pad(null as any, 2, '*')).toBe('**');
+    expect(padStart(null as any, 2)).toBe('  ');
+    expect(padEnd(undefined as any, 2)).toBe('  ');
+  });
 });
 
 describe('padStart', () => {
@@ -23,6 +30,11 @@ describe('padStart', () => {
   test('should return the original string for empty padding chars', () => {
     expect(padStart('abc', 6, '')).toBe('abc');
   });
+
+  test('should return the original string when it is already long enough', () => {
+    expect(padStart('abcdef', 3)).toBe('abcdef');
+    expect(padStart('abc')).toBe('abc');
+  });
 });
 
 describe('padEnd', () => {
@@ -33,5 +45,10 @@ describe('padEnd', () => {
 
   test('should return the original string for empty padding chars', () => {
     expect(padEnd('abc', 6, '')).toBe('abc');
+  });
+
+  test('should return the original string when it is already long enough', () => {
+    expect(padEnd('abcdef', 3)).toBe('abcdef');
+    expect(padEnd('abc')).toBe('abc');
   });
 });

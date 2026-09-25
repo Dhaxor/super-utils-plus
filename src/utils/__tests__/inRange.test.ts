@@ -1,4 +1,4 @@
-import { inRange } from '../../index';
+import { inRange } from '../../index.js';
 
 describe('inRange', () => {
   test('should support a single end argument', () => {

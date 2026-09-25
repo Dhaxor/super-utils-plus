@@ -1,4 +1,4 @@
-import { has, hasIn, hasPath, hasInPath } from '../has';
+import { has, hasIn, hasPath, hasInPath } from '../has.js';
 
 describe('has', () => {
   test('should check if object has a direct property', () => {
@@ -12,7 +12,7 @@ describe('has', () => {
       this.a = 1;
     }
     Foo.prototype.b = 2;
-    
+
     const foo = new (Foo as any)();
     expect(has(foo, 'a')).toBe(true);
     expect(has(foo, 'b')).toBe(false);
@@ -38,7 +38,7 @@ describe('hasIn', () => {
       this.a = 1;
     }
     Foo.prototype.b = 2;
-    
+
     const foo = new (Foo as any)();
     expect(hasIn(foo, 'a')).toBe(true);
     expect(hasIn(foo, 'b')).toBe(true);
@@ -82,7 +82,7 @@ describe('hasInPath', () => {
       this.a = { b: 2 };
     }
     Foo.prototype.c = { d: 3 };
-    
+
     const foo = new (Foo as any)();
     expect(hasInPath(foo, 'a.b')).toBe(true);
     expect(hasInPath(foo, 'c.d')).toBe(true);
@@ -95,7 +95,7 @@ describe('hasInPath', () => {
       this.a = { b: 2 };
     }
     Foo.prototype.c = { d: 3 };
-    
+
     const foo = new (Foo as any)();
     expect(hasInPath(foo, ['a', 'b'])).toBe(true);
     expect(hasInPath(foo, ['c', 'd'])).toBe(true);

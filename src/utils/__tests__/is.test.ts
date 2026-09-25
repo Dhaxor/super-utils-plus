@@ -1,8 +1,4 @@
-import { 
-  isNil,
-  isNumber,
-  isEqual
-} from '../is';
+import { isNil, isNumber, isEqual } from '../is.js';
 
 describe('Type checking functions', () => {
   describe('isNil', () => {
@@ -70,14 +66,12 @@ describe('Type checking functions', () => {
     });
 
     test('should compare nested structures', () => {
-      expect(isEqual(
-        { a: 1, b: { c: 2, d: [3, 4] } },
-        { a: 1, b: { c: 2, d: [3, 4] } }
-      )).toBe(true);
-      expect(isEqual(
-        { a: 1, b: { c: 2, d: [3, 4] } },
-        { a: 1, b: { c: 2, d: [3, 5] } }
-      )).toBe(false);
+      expect(isEqual({ a: 1, b: { c: 2, d: [3, 4] } }, { a: 1, b: { c: 2, d: [3, 4] } })).toBe(
+        true
+      );
+      expect(isEqual({ a: 1, b: { c: 2, d: [3, 4] } }, { a: 1, b: { c: 2, d: [3, 5] } })).toBe(
+        false
+      );
     });
 
     test('should compare dates', () => {

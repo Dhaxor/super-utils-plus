@@ -1,4 +1,4 @@
-import { result } from '../../index';
+import { result } from '../../index.js';
 
 describe('result', () => {
   test('should return the resolved non-function value', () => {
@@ -29,8 +29,10 @@ describe('result', () => {
       },
     };
 
-    expect(result(object, 'a.missing', function(this: { fallback: string }) {
-      return this.fallback;
-    })).toBe('from-default');
+    expect(
+      result(object, 'a.missing', function (this: { fallback: string }) {
+        return this.fallback;
+      })
+    ).toBe('from-default');
   });
 });

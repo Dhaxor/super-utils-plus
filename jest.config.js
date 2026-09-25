@@ -7,11 +7,12 @@ module.exports = {
   },
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.ts',
-  ],
+  // Source files import siblings with a `.js` extension (required for ESM output);
+  // map those back to the TypeScript sources when running under Jest.
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/*.test.ts'],
   coverageThreshold: {
     global: {
       branches: 80,
