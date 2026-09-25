@@ -1,3 +1,5 @@
+import { webcrypto } from 'crypto';
+
 import { random, randomInt, randomString, randomUUID } from '../random.js';
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -176,15 +178,13 @@ describe('randomString', () => {
 });
 
 describe('randomUUID', () => {
-  const cryptoDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'crypto');
+  const originalDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'crypto');
 
-  const restoreCrypto = () => {
-    if (cryptoDescriptor) {
-      Object.defineProperty(globalThis, 'crypto', cryptoDescriptor);
-    } else {
-      delete (globalThis as { crypto?: unknown }).crypto;
-    }
-  };
+  // Jest's Node 18 environment does not expose the Web Crypto global even though
+  // Node itself does, so install Node's implementation explicitly for every test.
+  const hostCrypto = (globalThis as { crypto?: Crypto }).crypto;
+  const nativeCrypto: Crypto =
+    typeof hostCrypto?.randomUUID === 'function' ? hostCrypto : (webcrypto as unknown as Crypto);
 
   const replaceCrypto = (value: unknown) => {
     Object.defineProperty(globalThis, 'crypto', {
@@ -195,9 +195,22 @@ describe('randomUUID', () => {
     });
   };
 
-  afterEach(() => {
+  const restoreCrypto = () => replaceCrypto(nativeCrypto);
+
+  beforeEach(() => {
     restoreCrypto();
+  });
+
+  afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    if (originalDescriptor) {
+      Object.defineProperty(globalThis, 'crypto', originalDescriptor);
+    } else {
+      delete (globalThis as { crypto?: unknown }).crypto;
+    }
   });
 
   test('should generate a v4 UUID when crypto.randomUUID is available', () => {
@@ -269,8 +282,12 @@ describe('randomUUID', () => {
     expect(uuids.size).toBe(100);
   });
 
-  test('should restore crypto after the fallback tests', () => {
-    expect(typeof crypto).toBe('object');
+  test('should not leak a replaced crypto into later tests', () => {
+    replaceCrypto({});
+    restoreCrypto();
+
+    expect(globalThis.crypto).toBe(nativeCrypto);
     expect(typeof crypto.randomUUID).toBe('function');
+    expect(randomUUID()).toMatch(UUID_V4);
   });
 });
