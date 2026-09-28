@@ -80,9 +80,22 @@ version tag is pushed.
    ```
 
 The workflow checks that the tag matches `package.json`, runs the full check,
-builds, verifies the packed tarball, and publishes with npm provenance. It
-authenticates with npm trusted publishing when that is configured for this
-repository on npmjs.com, or with an `NPM_TOKEN` repository secret otherwise.
+builds, verifies the packed tarball, and publishes with npm provenance.
+
+It authenticates with npm trusted publishing, so no npm token is stored in the
+repository. The package's trusted publisher on npmjs.com must be set to:
+
+| Field             | Value              |
+| ----------------- | ------------------ |
+| Publisher         | GitHub Actions     |
+| Organization/user | `Dhaxor`           |
+| Repository        | `super-utils-plus` |
+| Workflow filename | `release.yml`      |
+| Environment       | (blank)            |
+
+The `repository.url` in `package.json` must name the same repository with the
+same capitalisation, or npm rejects the provenance attestation. If a publish
+fails, the "Show npm trusted publishing errors" step prints npm's reason.
 
 ## Reporting bugs
 

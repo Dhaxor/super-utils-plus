@@ -109,12 +109,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dhaxor/super-utils-plus.git"
+    "url": "git+https://github.com/Dhaxor/super-utils-plus.git"
   },
   "bugs": {
-    "url": "https://github.com/dhaxor/super-utils-plus/issues"
+    "url": "https://github.com/Dhaxor/super-utils-plus/issues"
   },
-  "homepage": "https://github.com/dhaxor/super-utils-plus#readme",
+  "homepage": "https://github.com/Dhaxor/super-utils-plus#readme",
   "engines": {
     "node": ">=14.0.0"
   },
