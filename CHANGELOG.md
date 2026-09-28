@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-09-25
+### Fixed
+
+- `repository.url`, `bugs.url`, and `homepage` in `package.json` use the repository's
+  canonical owner capitalisation (`Dhaxor`), which npm requires to match when it
+  validates provenance.
+- The release workflow authenticates with npm trusted publishing exactly as npm
+  documents it and, when a publish fails, prints npm's trusted publishing error, which
+  npm otherwise hides behind a bare `ENEEDAUTH`.
+
+## [2.0.0] - 2026-09-28
 
 This release fixes security and correctness bugs across the library. Most code
 keeps working unchanged, but the behaviours below changed on purpose.
@@ -121,5 +130,5 @@ keeps working unchanged, but the behaviours below changed on purpose.
 Initial tracked release.
 
 [Unreleased]: https://github.com/Dhaxor/super-utils-plus/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/Dhaxor/super-utils-plus/compare/b8e1012...v2.0.0
-[1.1.0]: https://github.com/Dhaxor/super-utils-plus/tree/b8e1012
+[2.0.0]: https://github.com/Dhaxor/super-utils-plus/compare/v1.1.0...v2.0.0
+[1.1.0]: https://github.com/Dhaxor/super-utils-plus/releases/tag/v1.1.0

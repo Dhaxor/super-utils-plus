@@ -6,7 +6,8 @@ on:
 
 permissions:
   contents: read
-  # Required for npm trusted publishing and provenance attestations
+  # Lets npm exchange this job's GitHub OIDC token for a short-lived publish token
+  # (trusted publishing) and sign the provenance attestation
   id-token: write
 
 concurrency:
@@ -27,9 +28,12 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
 
-      # Trusted publishing (OIDC) needs npm 11.5.1 or newer
+      # Trusted publishing needs npm 11.5.1 or newer. Pinned to the npm 11 line so a
+      # new npm major version cannot change release behaviour unexpectedly.
       - name: Update npm
-        run: npm install -g npm@latest
+        run: |
+          npm install -g npm@11
+          npm --version
 
       - name: Check the tag matches package.json
         run: |
@@ -51,10 +55,15 @@ jobs:
       - name: Verify the packed tarball
         run: node scripts/verify-package.mjs
 
+      # Authenticates with npm trusted publishing: no npm token or secret is used.
       # Scripts are skipped because the steps above already checked and built dist/.
-      # Authentication uses trusted publishing when configured on npmjs.com, or the
-      # NPM_TOKEN repository secret otherwise.
       - name: Publish
         run: npm publish --provenance --access public --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # npm reports trusted-publishing failures only at verbose level, so a failed
+      # publish otherwise shows just "ENEEDAUTH". Surface the real reason.
+      - name: Show npm trusted publishing errors
+        if: failure()
+        run: |
+          grep -h -E "(silly|verbose|warn) oidc " ~/.npm/_logs/*-debug-0.log \
+            || echo "No trusted publishing entries in the npm debug log."
