@@ -38,7 +38,7 @@ export const isBoolean = (value: unknown): value is boolean => typeof value === 
 /**
  * Checks if value is a function
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export const isFunction = (value: unknown): value is Function => typeof value === 'function';
 
 /**
